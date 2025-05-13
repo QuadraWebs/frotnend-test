@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "module": "ESNext",  // Add this line
+    "moduleResolution": "node",  // Add this line
+    "esModuleInterop": true,  // Recommended
+    "allowSyntheticDefaultImports": true,  // Recommended
+    "target": "ESNext"  // Add this line
+    // other options...
+  }
+}

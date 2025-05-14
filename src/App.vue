@@ -1,12 +1,15 @@
 <template>
   <div class="min-h-screen bg-gray-100">
     <router-view />
+    <chat-bot />
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import ChatBot from '@/components/chatbot/ChatBot.vue';
 
 const authStore = useAuthStore();
 

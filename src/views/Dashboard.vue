@@ -2,10 +2,14 @@
   <div class="min-h-screen bg-gray-50">
     <app-header />
 
+    <!-- Tax Wizard for first-time users -->
+    <tax-wizard v-if="showWizard" @complete="completeWizard" @skip="skipWizard"
+      class="transition-all duration-300 ease-in-out" />
+
     <div class="py-4 sm:py-6">
       <header>
         <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-          <h1 class="text-xl sm:text-2xl font-bold leading-tight text-gray-900">Freelancer Tax Dashboard</h1>
+          <h1 class="text-xl sm:text-2xl font-bold leading-tight text-gray-900">Dashboard</h1>
         </div>
       </header>
       <main>
@@ -246,12 +250,39 @@ import { useAuthStore } from '@/stores/auth';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import UserProfile from '@/components/dashboard/UserProfile.vue';
+import TaxWizard from '@/components/onboarding/TaxWizard.vue';
 import Chart from 'chart.js/auto';
 
 const authStore = useAuthStore();
 const loading = ref(true);
+const showWizard = ref(true);
 const expensesChart = ref<HTMLCanvasElement | null>(null);
 let chart: Chart | null = null;
+
+const checkFirstTimeUser = () => {
+  // In a real app, you might check a flag in the user's profile
+  // For now, we'll use localStorage to simulate this
+  const hasCompletedWizard = localStorage.getItem('hasCompletedWizard');
+  showWizard.value = !hasCompletedWizard;
+};
+
+const completeWizard = (formData) => {
+  console.log('Wizard completed with data:', formData);
+  // Save the data or send it to your backend
+  showWizard.value = false;
+  console.log('showWizard after completion:', showWizard.value);
+
+  // You might want to refresh the dashboard data based on the user's selections
+  // For example:
+  // fetchPersonalizedTaxData(formData);
+};
+
+const skipWizard = () => {
+  console.log('Wizard skipped');
+  // Hide the wizard when skipped
+  showWizard.value = false;
+  console.log('showWizard after skip:', showWizard.value);
+};
 
 // Define icons
 const DollarIcon = defineComponent({
@@ -534,6 +565,7 @@ const initExpensesChart = () => {
 onMounted(async () => {
   try {
     await authStore.fetchUser();
+    showWizard.value = true;
   } catch (error) {
     console.error('Failed to fetch user data:', error);
   } finally {

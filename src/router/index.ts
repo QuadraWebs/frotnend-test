@@ -3,6 +3,8 @@ import Dashboard from '@/views/Dashboard.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import ReceiptFiling from '@/views/ReceiptFiling.vue';
+import IncomeSummaryReport from '@/views/IncomeSummaryReport.vue';
+import QuotationInvoice from '../views/QuotationInvoice.vue'
 
 const routes = [
   {
@@ -28,6 +30,20 @@ const routes = [
     name: 'ReceiptFiling',
     component: ReceiptFiling,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/quotation-invoice',
+    name: 'QuotationInvoice',
+    component: QuotationInvoice
+  },
+  {
+    path: '/reports/income-summary',
+    name: 'IncomeSummaryReport',
+    component: IncomeSummaryReport,
+    meta: {
+      requiresAuth: true,
+      title: 'Income Summary Report'
+    }
   }
 ];
 

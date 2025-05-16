@@ -54,7 +54,11 @@
               <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                 <div class="px-4 py-5 sm:p-6">
                   <h3 class="text-lg font-medium text-gray-900 mb-4">Upload Receipts</h3>
-  
+                  <button type="button" @click="selectedMethod = null"
+          class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <ArrowLeftIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          Back
+        </button>
                   <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center"
                     :class="{ 'bg-indigo-50 border-indigo-300': isDragging }" @dragover.prevent="isDragging = true"
                     @dragleave.prevent="isDragging = false" @drop.prevent="handleFileDrop">
@@ -244,6 +248,13 @@
   
             <!-- Manual Entry / Edit Receipt Form -->
             <div v-else-if="selectedMethod === 'manual' || isEditing" class="mt-6">
+              <div v-if="isNewReceipt && !extractedReceipts.length" class="mb-4">
+    <button type="button" @click="selectedMethod = null"
+      class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <ArrowLeftIcon class="-ml-0.5 mr-2 h-4 w-4" />
+      Back to Selection
+    </button>
+  </div>
                 <receipt-form
   :receipt="currentReceipt"
   :is-new="isNewReceipt"
@@ -543,6 +554,7 @@ interface Receipt {
   isDeductible: boolean;
   imageUrl?: string;
   imageFile?: File; // Store the original file for later upload
+  conversionMessage?: string;
 }
 
 // Component state
@@ -690,7 +702,7 @@ const processReceipts = async () => {
               price: item.unit_price || 0,
               quantity: item.quantity || 1,
               category: item.expense_category || 'Miscellaneous',
-              isDeductible: true
+              isDeductible: item.expense_category === 'Miscellaneous' ? false : true
             };
           }) || [];
           
@@ -703,9 +715,10 @@ const processReceipts = async () => {
             total: extractedData.total_amount || 0,
             category: extractedData.items?.[0]?.expense_category || 'Miscellaneous',
             items: mappedItems,
-            isDeductible: true,
+            isDeductible: extractedData.is_deductible,
             imageUrl: URL.createObjectURL(file),
-            imageFile: file
+            imageFile: file,
+            conversionMessage:extractedData.conversion_message || null
           };
           
           console.log('Created receipt object:', receipt); // Add this for debugging
@@ -814,7 +827,24 @@ const removeReceipt = (index: number) => {
   extractedReceipts.value.splice(index, 1);
 };
 
-const saveAllReceipts = async () => {
+const saveAllReceipts = async (updatedReceipts = null) => {
+  console.log('Saving all receipts:', updatedReceipts);
+  console.log('Default all receipts:', extractedReceipts.value);
+
+  // If updated receipts are provided from the form, use them
+  // but preserve the original imageFile references
+  if (updatedReceipts) {
+    // For each updated receipt, find the matching original receipt and preserve its imageFile
+    updatedReceipts.forEach(updatedReceipt => {
+      const originalReceipt = extractedReceipts.value.find(r => r.id === updatedReceipt.id);
+      if (originalReceipt && originalReceipt.imageFile) {
+        updatedReceipt.imageFile = originalReceipt.imageFile;
+      }
+    });
+    
+    extractedReceipts.value = updatedReceipts;
+  }
+  
   if (extractedReceipts.value.length === 0) return;
   
   isProcessing.value = true;
@@ -834,8 +864,8 @@ const saveAllReceipts = async () => {
       // Create form data for this receipt
       const formData = new FormData();
       
-      // Add receipt data as JSON
-      formData.append('data', JSON.stringify({
+      // Add receipt data as JSON, but exclude imageFile and imageUrl properties
+      const receiptData = {
         vendor: receipt.vendor,
         date: receipt.date,
         total: receipt.total,
@@ -848,14 +878,15 @@ const saveAllReceipts = async () => {
           category: item.category,
           is_deductible: item.isDeductible
         }))
-      }));
+      };
+      
+      formData.append('data', JSON.stringify(receiptData));
       
       // Add image file if available
       if (receipt.imageFile) {
         formData.append('image', receipt.imageFile);
       }
       
-      // Send the receipt to the backend
       await api.post('/receipts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -887,6 +918,8 @@ const saveAllReceipts = async () => {
     isProcessing.value = false;
   }
 };
+
+
 
 const captureImage = async () => {
   try {

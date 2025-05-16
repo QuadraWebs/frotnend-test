@@ -12,6 +12,11 @@
               :class="{ 'border-indigo-500 text-gray-900': $route.path === '/' }">
               Dashboard
             </router-link>
+            <router-link to="/quotation-invoice"
+              class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              :class="{ 'border-indigo-500 text-gray-900': $route.path === '/quo tation-invoice' }">
+              Quotation + Invoice
+            </router-link>
             <router-link to="/receipts"
               class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               :class="{ 'border-indigo-500 text-gray-900': $route.path === '/receipts' }">
@@ -21,10 +26,12 @@
               class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
               Expenses
             </a>
-            <a href="#"
-              class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-              Reports
-            </a>
+            <router-link to="/reports/income-summary"
+              class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              :class="{ 'border-indigo-500 text-gray-900': $route.path === '/reports/income-summary' }">
+              Report
+            </router-link>
+           
           </nav>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:items-center">

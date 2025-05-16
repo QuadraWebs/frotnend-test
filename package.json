@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
+    "html2pdf.js": "^0.10.3",
     "pinia": "^3.0.2",
     "router": "^2.2.0",
     "vue": "^3.5.13",

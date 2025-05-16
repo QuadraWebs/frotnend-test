@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-gray-50">
     <app-header />
 
-    <!-- Tax Wizard for first-time users -->
-    <tax-wizard v-if="showWizard" @complete="completeWizard" @skip="skipWizard"
+    <tax-wizard v-if="showWizard && !authStore.user?.date_filled" 
+      @complete="completeWizard" @skip="skipWizard"
       class="transition-all duration-300 ease-in-out" />
 
     <div class="py-4 sm:py-6">
@@ -325,7 +325,7 @@ const taxSuggestions = ref([]);
 const loadingSuggestions = ref(true);
 const authStore = useAuthStore();
 const loading = ref(true);
-const showWizard = ref(true);
+const showWizard = ref(false);
 const expensesChart = ref<HTMLCanvasElement | null>(null);
 let chart: Chart | null = null;
 
@@ -347,10 +347,8 @@ const fetchTaxSuggestions = async () => {
 };
 
 const checkFirstTimeUser = () => {
-  // In a real app, you might check a flag in the user's profile
-  // For now, we'll use localStorage to simulate this
   const hasCompletedWizard = localStorage.getItem('hasCompletedWizard');
-  showWizard.value = !hasCompletedWizard;
+  showWizard.value = !hasCompletedWizard && !authStore.user?.date_filled;
 };
 
 const completeWizard = (formData) => {
@@ -501,7 +499,6 @@ const DocumentCheckIcon = defineComponent({
   ])
 });
 
-// Dummy tax data in JSON format
 const taxData = ref({
   taxStatus: "Up to date",
   annualIncome: 85000,
@@ -577,8 +574,6 @@ const taxData = ref({
   ],
 });
 
-// Format currency helper function
-// Format currency helper function
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-MY', {
     style: 'currency',
@@ -636,14 +631,12 @@ const fetchDeductibilitySummary = async () => {
   }
 };
 
-// Initialize the expenses chart
 const initExpensesChart = () => {
   if (!expensesChart.value) return;
 
   const ctx = expensesChart.value.getContext('2d');
   if (!ctx) return;
 
-  // Destroy existing chart if it exists
   if (chart) {
     chart.destroy();
   }
@@ -718,11 +711,11 @@ onMounted(async () => {
     // Fetch tax suggestions
     await fetchTaxSuggestions();
     showWizard.value = true;
+    checkFirstTimeUser();
   } catch (error) {
     console.error('Failed to fetch user data:', error);
   } finally {
     loading.value = false;
-    // Initialize chart after data is loaded
     setTimeout(() => {
       initExpensesChart();
     }, 100);

@@ -125,7 +125,6 @@ export const useAuthStore = defineStore('auth', {
       
       try {
         const response = await api.get('/user');
-        // No need to add headers here as the API service already adds them
         this.user = response.data;
         this.isAuthenticated = true;
       } catch (error) {

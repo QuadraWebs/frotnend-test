@@ -3,6 +3,7 @@ import Dashboard from '@/views/Dashboard.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import ReceiptFiling from '@/views/ReceiptFiling.vue';
+import Expenses from '@/views/Expenses.vue';
 import IncomeSummaryReport from '@/views/IncomeSummaryReport.vue';
 import QuotationInvoice from '../views/QuotationInvoice.vue'
 
@@ -29,6 +30,12 @@ const routes = [
     path: '/receipts',
     name: 'ReceiptFiling',
     component: ReceiptFiling,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/expenses',
+    name: 'Expenses',
+    component: Expenses,
     meta: { requiresAuth: true }
   },
   {

@@ -22,7 +22,6 @@
             </div>
   
             <div v-else class="mt-4 space-y-4">
-              <!-- Expense Summary Card -->
               <div class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-md">
                 <div class="px-4 py-3 sm:p-4">
                   <h2 class="text-base leading-6 font-semibold text-gray-900">Expense Summary</h2>
@@ -30,7 +29,6 @@
                     Track and categorize your business expenses for tax deductions.
                   </p>
                   
-                  <!-- Expense Stats - Mobile optimized grid -->
                   <div class="mt-4 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="bg-indigo-50 rounded-lg p-3">
                       <p class="text-xs text-indigo-700 font-medium">Total Expenses</p>
@@ -52,21 +50,14 @@
                 </div>
               </div>
   
-              <!-- Action Buttons - Stack on mobile -->
-              <div class="flex flex-col xs:flex-row justify-between space-y-2 xs:space-y-0">
-                <button @click="showCategoryModal = true"
-                  class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out flex items-center justify-center">
-                  <TagIcon class="h-4 w-4 mr-2" />
-                  Manage Categories
-                </button>
+              <div class="flex flex-col xs:flex-row justify-end space-y-2 xs:space-y-0">
                 <button @click="showAddExpenseModal = true"
-                  class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out flex items-center justify-center">
-                  <PlusIcon class="h-4 w-4 mr-2" />
-                  Add Expense
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out flex items-center justify-center">
+                    <PlusIcon class="h-4 w-4 mr-2" />
+                    Add Expense
                 </button>
               </div>
   
-              <!-- Expense Chart -->
               <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                 <div class="px-4 py-3 border-b border-gray-100">
                   <h3 class="text-sm font-semibold text-gray-900">
@@ -74,9 +65,7 @@
                   </h3>
                 </div>
                 <div class="px-4 py-3">
-                  <!-- Chart and categories stacked on mobile, side by side on larger screens -->
                   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <!-- Chart - Fixed height on mobile -->
                     <div class="bg-white rounded-lg p-3 h-64">
                       <canvas ref="expensesChart"></canvas>
                     </div>
@@ -111,18 +100,6 @@
                   <h3 class="text-sm font-semibold text-gray-900">
                     Recent Expenses
                   </h3>
-                  <div class="flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-2 w-full xs:w-auto">
-                    <select v-model="filters.category"
-                      class="text-xs border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full">
-                      <option value="">All Categories</option>
-                      <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
-                    </select>
-                    <select v-model="filters.deductibility"
-                      class="text-xs border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full">
-                      <option value="">All Deductibility</option>
-                      <option v-for="type in deductibilityTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
-                    </select>
-                  </div>
                 </div>
   
                 <!-- Mobile-friendly expense list -->
@@ -264,38 +241,17 @@
         <div class="p-6 overflow-y-auto max-h-[70vh]">
           <form @submit.prevent="saveExpense" class="space-y-4">
             <div>
-              <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Expenses Name</label>
               <input type="text" id="description" v-model="currentExpense.description"
                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
                 placeholder="What was this expense for?" required />
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                <input type="number" id="quantity" v-model="currentExpense.quantity" min="1" step="1"
-                  class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
-                  placeholder="1" required @input="calculateTotalPrice" />
-              </div>
-              
-              <div>
-                <label for="unit_price" class="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
-                <div class="relative rounded-md shadow-sm">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span class="text-gray-500 sm:text-sm">$</span>
-                  </div>
-                  <input type="number" id="unit_price" v-model="currentExpense.unit_price" step="0.01" min="0.01"
-                    class="pl-7 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
-                    placeholder="0.00" required @input="calculateTotalPrice" />
-                </div>
-              </div>
-            </div>
-            
             <div>
               <label for="total_price" class="block text-sm font-medium text-gray-700 mb-1">Total Price</label>
               <div class="relative rounded-md shadow-sm">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span class="text-gray-500 sm:text-sm">$</span>
+                <div class="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none">
+                  <span class="text-gray-500 sm:text-sm">RM</span>
                 </div>
                 <input type="number" id="total_price" v-model="currentExpense.total_price" step="0.01" min="0.01"
                   class="pl-7 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
@@ -303,27 +259,62 @@
               </div>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+            <div>
                 <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select id="category_id" v-model="currentExpense.category_id"
-                  class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
-                  required>
-                  <option value="" disabled>Select a category</option>
-                  <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
-                </select>
-              </div>
-              
-              <div>
-                <label for="deductibility_id" class="block text-sm font-medium text-gray-700 mb-1">Deductibility</label>
-                <select id="deductibility_id" v-model="currentExpense.deductibility_id"
-                  class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
-                  required>
-                  <option value="" disabled>Select deductibility type</option>
-                  <option v-for="type in deductibilityTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
-                </select>
-              </div>
-            </div>
+                <div class="relative">
+                    <div v-if="!showNewCategoryInput">
+                      <select id="category_id" v-model.number="currentExpense.category_id"
+                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                          required>
+                          <option :value="null" disabled>Select a category</option>
+                          
+                          <template v-if="Array.isArray(categories)">
+                            <!-- Default categories group -->
+                            <optgroup label="Default Categories" v-if="categories.some(c => c.is_default)">
+                              <option v-for="category in categories.filter(c => c.is_default)" 
+                                      :key="category.id" 
+                                      :value="category.id">
+                                {{ category.name }}
+                              </option>
+                            </optgroup>
+                            
+                            <!-- Custom categories group -->
+                            <optgroup label="Custom Categories" v-if="categories.some(c => !c.is_default)">
+                              <option v-for="category in categories.filter(c => !c.is_default)" 
+                                      :key="category.id" 
+                                      :value="category.id">
+                                {{ category.name }}
+                              </option>
+                            </optgroup>
+                          </template>
+                          
+                          <option v-else value="0">No categories available</option>
+                      </select>
+                    <div class="mt-2">
+                        <button type="button" @click="showNewCategoryInput = true"
+                        class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
+                        <PlusIcon class="h-3 w-3 mr-1" /> Add new category
+                        </button>
+                    </div>
+                    </div>
+                    
+                    <div v-else class="space-y-2">
+                    <div class="flex space-x-2">
+                        <input type="text" v-model="newCategoryName" 
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                        placeholder="Enter new category name" />
+                        <button type="button" @click="addCategoryFromModal"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out">
+                        Add
+                        </button>
+                    </div>
+                    <button type="button" @click="showNewCategoryInput = false"
+                        class="text-sm text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
+                    </div>
+                </div>
+                </div>
             
             <div v-if="isPartiallyDeductible">
               <label for="deduction_percentage" class="block text-sm font-medium text-gray-700 mb-1">
@@ -485,6 +476,8 @@
 import { ref, computed, onMounted, watch, h, defineComponent } from 'vue';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import Chart from 'chart.js/auto';
+import api from '@/services/api';
+import { useAuthStore } from '@/stores/auth';
 
 // State
 const loading = ref(true);
@@ -494,10 +487,135 @@ const showDeleteModal = ref(false);
 const editingExpense = ref(false);
 const deletingCategory = ref(false);
 const itemToDeleteId = ref('');
+const showNewCategoryInput = ref(false);
+const newCategoryName = ref('');
 const expensesChart = ref<HTMLCanvasElement | null>(null);
+const authStore = useAuthStore();
+const summaryData = ref({
+  total: 0,
+  fullyDeductible: 0,
+  partiallyDeductible: 0,
+  nonDeductible: 0
+});
+
 let chart: Chart | null = null;
 
-// Current expense being edited or created
+const fetchExpenseSummary = async () => {
+  try {
+    const userId = authStore.user?.id;
+    const response = await api.get('/get-expenses-summary', {
+      params: { user_id: userId }
+    });
+    
+    console.log('Expense summary fetched successfully:', response.data);
+    
+    // Update the summary data with the fetched data
+    if (response.data && typeof response.data === 'object') {
+      // If the API returns the exact format we need
+      if ('total' in response.data && 
+          'fullyDeductible' in response.data && 
+          'partiallyDeductible' in response.data && 
+          'nonDeductible' in response.data) {
+        summaryData.value = response.data;
+      } 
+      // If the API returns a different format, try to map it
+      else if (response.data.summary) {
+        summaryData.value = response.data.summary;
+      }
+      else {
+        // Try to extract values from whatever format is returned
+        summaryData.value = {
+          total: parseFloat(response.data.total || 0),
+          fullyDeductible: parseFloat(response.data.fully_deductible || 0),
+          partiallyDeductible: parseFloat(response.data.partially_deductible || 0),
+          nonDeductible: parseFloat(response.data.non_deductible || 0)
+        };
+      }
+    } else {
+      console.error('Unexpected API response format for expense summary:', response.data);
+      // Fall back to calculation
+      calculateExpenseSummary();
+    }
+  } catch (error) {
+    console.error('Error fetching expense summary:', error);
+    // If API fails, calculate from local expenses data
+    calculateExpenseSummary();
+  }
+};
+
+const calculateExpenseSummary = () => {
+  const total = expenses.value.reduce((sum, expense) => sum + parseFloat(expense.total_price), 0);
+  
+  const fullyDeductible = expenses.value
+    .filter(expense => expense.deductibility_id === 1)
+    .reduce((sum, expense) => sum + parseFloat(expense.total_price), 0);
+  
+  const partiallyDeductible = expenses.value
+    .filter(expense => expense.deductibility_id === 2)
+    .reduce((sum, expense) => {
+      const deductibleAmount = parseFloat(expense.total_price) * (parseFloat(expense.deduction_percentage) / 100);
+      return sum + deductibleAmount;
+    }, 0);
+  
+  const nonDeductible = expenses.value
+    .filter(expense => expense.deductibility_id === 3)
+    .reduce((sum, expense) => sum + parseFloat(expense.total_price), 0);
+  
+  summaryData.value = {
+    total,
+    fullyDeductible,
+    partiallyDeductible,
+    nonDeductible
+  };
+};
+
+const addCategoryFromModal = async () => {
+  if (!newCategoryName.value.trim()) return;
+  
+  try {
+    const userId = authStore.user?.id;
+    
+    const categoryData = {
+      name: newCategoryName.value.trim(),
+      description: null, 
+      is_default: false,
+      user_id: userId
+    };
+        
+    const response = await api.post(`/expense-categories?user_id=${userId}`, categoryData);
+    console.log('Category added successfully:', response.data);
+    
+    const newCategory = response.data;
+    categories.value.push(newCategory);
+    
+    currentExpense.value.category_id = newCategory.id;
+    
+    newCategoryName.value = '';
+    showNewCategoryInput.value = false;
+  } catch (error) {
+    console.error('Error adding category:', error);
+    
+    // Fallback: create a local category if API fails
+    console.log('Using fallback to create local category');
+    const newId = Math.max(...categories.value.map(c => c.id), 0) + 1;
+    const newCategory = {
+      id: newId,
+      user_id: userId || 1,
+      name: newCategoryName.value.trim(),
+      description: null,
+      is_default: false,
+      is_system: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    categories.value.push(newCategory);
+    currentExpense.value.category_id = newId;
+    newCategoryName.value = '';
+    showNewCategoryInput.value = false;
+  }
+};
+
 const currentExpense = ref({
   id: '',
   receipt_id: 1,
@@ -505,8 +623,8 @@ const currentExpense = ref({
   quantity: 1,
   unit_price: 0,
   total_price: 0,
-  category_id: '',
-  deductibility_id: '',
+  category_id: null, 
+  deductibility_id: null,  
   deduction_percentage: 100,
   notes: '',
   created_at: ''
@@ -774,13 +892,46 @@ const expenses = ref([
   }
 ]);
 
-// Filters
 const filters = ref({
   category: '',
   deductibility: ''
 });
 
-// Computed properties
+const fetchCategories = async () => {
+  try {
+    const response = await api.get('/expense-categories', {
+      params: { user_id: authStore.user?.id }
+    });
+    
+    if (Array.isArray(response.data)) {
+      categories.value = response.data;
+    } else if (response.data && typeof response.data === 'object') {
+      categories.value = Array.isArray(response.data.categories) 
+        ? response.data.categories 
+        : Object.values(response.data);
+    } else {
+      console.error('Unexpected API response format:', response.data);
+      return;
+    }
+    
+    if (Array.isArray(categories.value)) {
+      categories.value.sort((a, b) => {
+        if (a.is_default && !b.is_default) return -1;
+        if (!a.is_default && b.is_default) return 1;
+        
+        return a.name.localeCompare(b.name);
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching expense categories:', error);
+    console.log('Using fallback categories');
+    
+    if (!Array.isArray(categories.value)) {
+      categories.value = [];
+    }
+  }
+};
+
 const filteredExpenses = computed(() => {
   return expenses.value.filter(expense => {
     const categoryMatch = !filters.value.category || expense.category_id.toString() === filters.value.category;
@@ -790,35 +941,18 @@ const filteredExpenses = computed(() => {
 });
 
 const expenseSummary = computed(() => {
-  const total = expenses.value.reduce((sum, expense) => sum + expense.total_price, 0);
-  const fullyDeductible = expenses.value
-    .filter(expense => expense.deductibility_id === 1)
-    .reduce((sum, expense) => sum + expense.total_price, 0);
-  
-  const partiallyDeductible = expenses.value
-    .filter(expense => expense.deductibility_id === 2)
-    .reduce((sum, expense) => {
-      const deductibleAmount = expense.total_price * (expense.deduction_percentage / 100);
-      return sum + deductibleAmount;
-    }, 0);
-  
-  const nonDeductible = expenses.value
-    .filter(expense => expense.deductibility_id === 3)
-    .reduce((sum, expense) => sum + expense.total_price, 0);
-  
-  return {
-    total,
-    fullyDeductible,
-    partiallyDeductible,
-    nonDeductible
-  };
+  return summaryData.value;
 });
 
 const topCategories = computed(() => {
+  if (!Array.isArray(categories.value)) {
+    return [];
+  }
+  
   const categoryMap = new Map();
   
   expenses.value.forEach(expense => {
-    const categoryId = expense.category_id;
+    const categoryId = parseInt(expense.category_id);
     if (!categoryMap.has(categoryId)) {
       categoryMap.set(categoryId, {
         id: categoryId,
@@ -829,7 +963,7 @@ const topCategories = computed(() => {
     }
     
     const category = categoryMap.get(categoryId);
-    category.amount += expense.total_price;
+    category.amount += parseFloat(expense.total_price);
     category.count += 1;
   });
   
@@ -842,7 +976,6 @@ const isPartiallyDeductible = computed(() => {
   return currentExpense.value.deductibility_id === 2;
 });
 
-// Define icons
 const TagIcon = defineComponent({
   render: () => h('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
@@ -1007,6 +1140,11 @@ const formatDate = (dateString: string): string => {
 };
 
 const getCategoryName = (categoryId: number): string => {
+  if (!Array.isArray(categories.value)) {
+    console.warn('Categories is not an array:', categories.value);
+    return 'Uncategorized';
+  }
+  
   const category = categories.value.find(c => c.id === categoryId);
   return category ? category.name : 'Uncategorized';
 };
@@ -1068,8 +1206,8 @@ const openAddExpenseModal = () => {
     quantity: 1,
     unit_price: 0,
     total_price: 0,
-    category_id: '',
-    deductibility_id: '',
+    category_id: null, 
+    deductibility_id: null, 
     deduction_percentage: 100,
     notes: '',
     created_at: new Date().toISOString()
@@ -1086,28 +1224,93 @@ const editExpense = (expense) => {
 const closeModal = () => {
   showAddExpenseModal.value = false;
   editingExpense.value = false;
+  showNewCategoryInput.value = false;
+  newCategoryName.value = '';
 };
 
-const saveExpense = () => {
-  if (editingExpense.value) {
-    // Update existing expense
-    const index = expenses.value.findIndex(e => e.id === currentExpense.value.id);
-    if (index !== -1) {
-      expenses.value[index] = { ...currentExpense.value };
-    }
-  } else {
-    // Add new expense
-    const newId = Math.max(...expenses.value.map(e => e.id)) + 1;
-    expenses.value.push({
+const saveExpense = async () => {
+  try {
+    currentExpense.value.updated_at = new Date().toISOString();
+    
+    const userId = authStore.user?.id;
+    
+    currentExpense.value.receipt_id = Math.floor(Math.random() * 9000) + 1000; // Random 4-digit number
+    currentExpense.value.created_at = new Date().toISOString();
+
+    // Prepare data for API
+    const expenseData = {
+      ...currentExpense.value,
+      user_id: userId
+    };
+
+    // Add directly to local state first for immediate UI update
+    const newId = Math.max(0, ...expenses.value.map(e => e.id)) + 1;
+    const newExpense = { 
       ...currentExpense.value,
       id: newId,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    });
+      user_id: userId
+    };
+
+    expenses.value.push(newExpense);
+    console.log('New expense added locally:', newExpense);
+
+    // Then make API call
+    try {
+      const response = await api.post('/expenses', expenseData);
+      console.log('Expense also saved to API:', response.data);
+    } catch (apiError) {
+      console.error('API error when creating expense, but local state was updated:', apiError);
+    }
+
+    // Reset the form fields
+    currentExpense.value = {
+      id: '',
+      receipt_id: 1,
+      description: '',
+      quantity: 1,
+      unit_price: 0,
+      total_price: 0,
+      category_id: null, 
+      deductibility_id: null,  
+      deduction_percentage: 100,
+      notes: '',
+      created_at: ''
+    };
+
+    // Close the modal
+    showAddExpenseModal.value = false;
+    fetchExpenseSummary();
+
+    // Refresh the chart
+    setTimeout(() => {
+      initExpensesChart();
+    }, 100);
+  } catch (error) {
+    console.error('Error saving expense:', error);
+    // You could add error handling UI here
   }
-  
-  showAddExpenseModal.value = false;
-  initExpensesChart();
+};
+
+const fetchRecentExpenses = async () => {
+  try {
+    const userId = authStore.user?.id;
+    const response = await api.get('/get-recent-expenses', {
+      params: { user_id: userId }
+    });
+    
+    // Update the expenses array with the fetched data
+    if (Array.isArray(response.data)) {
+      expenses.value = response.data;
+    } else if (response.data && typeof response.data === 'object' && Array.isArray(response.data.expenses)) {
+      expenses.value = response.data.expenses;
+    } else {
+      console.error('Unexpected API response format for recent expenses:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching recent expenses:', error);
+    // Keep the sample data as fallback if API fails
+    console.log('Using fallback expense data');
+  }
 };
 
 const deleteExpense = (id) => {
@@ -1154,6 +1357,17 @@ const editCategory = (category) => {
   }
 };
 
+watch(() => currentExpense.value.category_id, (newCategoryId, oldCategoryId) => {
+  if (newCategoryId !== oldCategoryId) {
+    const selectedCategory = categories.value.find(c => c.id === newCategoryId);
+    console.log('Category selected:', {
+      categoryId: newCategoryId,
+      categoryName: selectedCategory ? selectedCategory.name : 'Unknown',
+      fullCategory: selectedCategory
+    });
+  }
+});
+
 const deleteCategory = (id) => {
   deletingCategory.value = true;
   itemToDeleteId.value = id.toString();
@@ -1169,6 +1383,7 @@ const confirmDelete = () => {
     // Delete expense
     const id = parseInt(itemToDeleteId.value);
     expenses.value = expenses.value.filter(e => e.id !== id);
+    fetchExpenseSummary();
     initExpensesChart();
   }
   
@@ -1194,7 +1409,7 @@ const initExpensesChart = () => {
   expenses.value.forEach(expense => {
     const categoryName = getCategoryName(expense.category_id);
     const currentTotal = categoryTotals.get(categoryName) || 0;
-    categoryTotals.set(categoryName, currentTotal + expense.total_price);
+    categoryTotals.set(categoryName, currentTotal + parseFloat(expense.total_price));
   });
   
   // Sort categories by total amount (descending)
@@ -1262,19 +1477,19 @@ const initExpensesChart = () => {
   });
 };
 
-// Lifecycle hooks
-onMounted(() => {
-  // Simulate loading data
+onMounted(async () => {
+  await authStore.fetchUser();
+  fetchCategories();
+  fetchRecentExpenses();
+  fetchExpenseSummary(); 
   setTimeout(() => {
     loading.value = false;
-    // Initialize chart after data is loaded
     setTimeout(() => {
       initExpensesChart();
     }, 100);
   }, 1000);
 });
 
-// Watch for filter changes to update chart
 watch([() => filters.value.category, () => filters.value.deductibility], () => {
   setTimeout(() => {
     initExpensesChart();

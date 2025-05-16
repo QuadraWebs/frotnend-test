@@ -522,16 +522,6 @@ const taxData = ref({
   },
   upcomingDeadlines: [
     {
-      name: "Quarterly Estimated Tax Payment (Q2)",
-      date: "June 15, 2023",
-      status: "Completed"
-    },
-    {
-      name: "Quarterly Estimated Tax Payment (Q3)",
-      date: "September 15, 2023",
-      status: "Pending"
-    },
-    {
       name: "Annual Tax Return Filing",
       date: "April 15, 2024",
       status: "Pending"
@@ -590,47 +580,8 @@ const formatCurrency = (amount: number): string => {
 
 const fetchDeductibilitySummary = async () => {
   try {
-    const response = await api.get('/dashboard/deductibility-summary');
-    const data = response.data;
-
-    // Map the backend data to our frontend structure
-    const deductionsSummary = {
-      fullyDeductible: 0,
-      fullyDeductibleCount: 0,
-      partiallyDeductible: 0,
-      partiallyDeductibleCount: 0,
-      nonDeductible: 0,
-      nonDeductibleCount: 0,
-      unassigned: 0,
-      unassignedCount: 0
-    };
-
-    // Process each category from the summary array
-    data.summary.forEach((item) => {
-      if (item.deductibility_name === "Fully Deductible") {
-        deductionsSummary.fullyDeductible = parseFloat(item.total_amount) || 0;
-        deductionsSummary.fullyDeductibleCount = parseInt(item.item_count) || 0;
-      } else if (item.deductibility_name === "Partially Deductible") {
-        deductionsSummary.partiallyDeductible = parseFloat(item.total_amount) || 0;
-        deductionsSummary.partiallyDeductibleCount = parseInt(item.item_count) || 0;
-      } else if (item.deductibility_name === "Non-Deductible") {
-        deductionsSummary.nonDeductible = parseFloat(item.total_amount) || 0;
-        deductionsSummary.nonDeductibleCount = parseInt(item.item_count) || 0;
-      } else if (item.deductibility_name === "Unassigned") {
-        deductionsSummary.unassigned = parseFloat(item.total_amount) || 0;
-        deductionsSummary.unassignedCount = parseInt(item.item_count) || 0;
-      }
-    });
-
-    // Update the tax data with the fetched information
-    taxData.value.expensesSummary = deductionsSummary;
-
-    // Also update the total deductions amount (fully + partially deductible)
-    taxData.value.deductions = deductionsSummary.fullyDeductible + deductionsSummary.partiallyDeductible;
-
-    // Initialize or update the chart with the new data
-    initExpensesChart();
-
+    // Call the new API endpoint instead
+    await fetchExpenseSummary();
   } catch (error) {
     console.error('Failed to fetch deductibility summary:', error);
   }
@@ -708,12 +659,91 @@ const initExpensesChart = () => {
   });
 };
 
+const fetchExpenseSummary = async () => {
+  try {
+    const userId = authStore.user?.id;
+    const response = await api.get('/get-expenses-summary', {
+      params: { user_id: userId }
+    });
+    
+    console.log('Expense summary fetched successfully:', response.data);
+    
+    // Update the tax data with the fetched expense summary
+    if (response.data && typeof response.data === 'object') {
+      // If the API returns the exact format we need
+      if ('fullyDeductible' in response.data && 
+          'partiallyDeductible' in response.data && 
+          'nonDeductible' in response.data) {
+        
+        // Update the expense summary
+        taxData.value.expensesSummary = {
+          fullyDeductible: parseFloat(response.data.fullyDeductible || 0),
+          partiallyDeductible: parseFloat(response.data.partiallyDeductible || 0),
+          nonDeductible: parseFloat(response.data.nonDeductible || 0),
+          fullyDeductibleCount: response.data.fullyDeductibleCount || 0,
+          partiallyDeductibleCount: response.data.partiallyDeductibleCount || 0,
+          nonDeductibleCount: response.data.nonDeductibleCount || 0,
+          unassigned: 0,
+          unassignedCount: 0
+        };
+        
+        // Also update the total deductions
+        taxData.value.deductions = parseFloat(response.data.fullyDeductible || 0) + 
+                                  parseFloat(response.data.partiallyDeductible || 0);
+      } 
+      // If the API returns a nested format
+      else if (response.data.summary) {
+        const summary = response.data.summary;
+        
+        taxData.value.expensesSummary = {
+          fullyDeductible: parseFloat(summary.fullyDeductible || summary.fully_deductible || 0),
+          partiallyDeductible: parseFloat(summary.partiallyDeductible || summary.partially_deductible || 0),
+          nonDeductible: parseFloat(summary.nonDeductible || summary.non_deductible || 0),
+          fullyDeductibleCount: summary.fullyDeductibleCount || summary.fully_deductible_count || 0,
+          partiallyDeductibleCount: summary.partiallyDeductibleCount || summary.partially_deductible_count || 0,
+          nonDeductibleCount: summary.nonDeductibleCount || summary.non_deductible_count || 0,
+          unassigned: 0,
+          unassignedCount: 0
+        };
+        
+        taxData.value.deductions = parseFloat(summary.fullyDeductible || summary.fully_deductible || 0) + 
+                                  parseFloat(summary.partiallyDeductible || summary.partially_deductible || 0);
+      }
+      // If the API returns snake_case format
+      else {
+        taxData.value.expensesSummary = {
+          fullyDeductible: parseFloat(response.data.fully_deductible || 0),
+          partiallyDeductible: parseFloat(response.data.partially_deductible || 0),
+          nonDeductible: parseFloat(response.data.non_deductible || 0),
+          fullyDeductibleCount: response.data.fully_deductible_count || 0,
+          partiallyDeductibleCount: response.data.partially_deductible_count || 0,
+          nonDeductibleCount: response.data.non_deductible_count || 0,
+          unassigned: 0,
+          unassignedCount: 0
+        };
+        
+        taxData.value.deductions = parseFloat(response.data.fully_deductible || 0) + 
+                                  parseFloat(response.data.partially_deductible || 0);
+      }
+      
+      // Initialize or update the chart with the new data
+      initExpensesChart();
+    } else {
+      console.error('Unexpected API response format for expense summary:', response.data);
+    }
+  } catch (error) {
+    console.error('Failed to fetch expense summary:', error);
+    // Keep using the default values if API fails
+  }
+};
+
 onMounted(async () => {
   try {
     await authStore.fetchUser();
     checkWizardStatus();
     await fetchDeductibilitySummary();
     await fetchTaxSuggestions();
+    await fetchExpenseSummary();
   } catch (error) {
     console.error('Failed to fetch user data:', error);
   } finally {

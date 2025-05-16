@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50">
     <app-header />
 
-    <tax-wizard v-if="!shouldShowWizard" @complete="completeWizard" @skip="skipWizard"
+    <tax-wizard v-if="shouldShowWizard" @complete="completeWizard" @skip="skipWizard"
       class="transition-all duration-300 ease-in-out" />
 
     <div class="py-4 sm:py-6">

@@ -710,7 +710,6 @@ onMounted(async () => {
     await fetchDeductibilitySummary();
     // Fetch tax suggestions
     await fetchTaxSuggestions();
-    showWizard.value = true;
     checkFirstTimeUser();
   } catch (error) {
     console.error('Failed to fetch user data:', error);

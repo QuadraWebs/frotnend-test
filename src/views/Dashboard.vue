@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50">
     <app-header />
 
-    <tax-wizard v-if="showWizard && !authStore.user?.date_filled" 
+    <tax-wizard v-if="shouldShowWizard" 
       @complete="completeWizard" @skip="skipWizard"
       class="transition-all duration-300 ease-in-out" />
 
@@ -313,25 +313,39 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, defineComponent, h } from 'vue';
+import { onMounted, ref, defineComponent, h, watch, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import UserProfile from '@/components/dashboard/UserProfile.vue';
 import TaxWizard from '@/components/onboarding/TaxWizard.vue';
 import Chart from 'chart.js/auto';
 import api from '@/services/api'; 
+
 const taxSuggestions = ref([]);
 const loadingSuggestions = ref(true);
 const authStore = useAuthStore();
 const loading = ref(true);
+const router = useRouter();
 const showWizard = ref(false);
+const userDataLoaded = ref(false);
+const wizardManuallyDismissed = ref(false);
 const expensesChart = ref<HTMLCanvasElement | null>(null);
 let chart: Chart | null = null;
 
 const navigateToReceiptFiling = () => {
   window.open('https://mytax.hasil.gov.my/', '_blank');
 };
+
+const shouldShowWizard = computed(() => {
+  if (!userDataLoaded.value) return false;
+  
+  if (wizardManuallyDismissed.value) return false;
+  
+  // Show if data_filled is explicitly false
+  return authStore.user && authStore.user.data_filled === false;
+});
 
 const fetchTaxSuggestions = async () => {
   try {
@@ -346,27 +360,62 @@ const fetchTaxSuggestions = async () => {
   }
 };
 
+const checkWizardStatus = () => {
+  console.log('Checking wizard status, data_filled:', authStore.user?.data_filled);
+  
+  userDataLoaded.value = true;
+  
+  if (authStore.user && authStore.user.data_filled === false) {
+    console.log('User needs to complete wizard');
+    localStorage.setItem('forceDashboard', 'true');
+    if (router.currentRoute.value.path !== '/') {
+      router.push('/');
+    }
+  } else {
+    console.log('User has completed wizard');
+    // Clear the force dashboard flag once user has completed the wizard
+    localStorage.removeItem('forceDashboard');
+  }
+};
+
 const checkFirstTimeUser = () => {
   const hasCompletedWizard = localStorage.getItem('hasCompletedWizard');
-  showWizard.value = !hasCompletedWizard && !authStore.user?.date_filled;
+  showWizard.value = !hasCompletedWizard && !authStore.user?.data_filled;
 };
 
-const completeWizard = (formData) => {
+const completeWizard = async (formData) => {
   console.log('Wizard completed with data:', formData);
-  // Save the data or send it to your backend
-  showWizard.value = false;
-  console.log('showWizard after completion:', showWizard.value);
-
-  // You might want to refresh the dashboard data based on the user's selections
-  // For example:
-  // fetchPersonalizedTaxData(formData);
+  
+  try {
+    await api.post('/user/complete-wizard', formData);
+    
+    wizardManuallyDismissed.value = true;
+    
+    await authStore.fetchUser();
+    
+    localStorage.setItem('hasCompletedWizard', 'true');
+    
+    localStorage.removeItem('forceDashboard');
+    
+    await fetchDeductibilitySummary();
+    await fetchTaxSuggestions();
+  } catch (error) {
+    console.error('Failed to complete wizard:', error);
+  }
 };
 
-const skipWizard = () => {
+const skipWizard = async () => {
   console.log('Wizard skipped');
-  // Hide the wizard when skipped
-  showWizard.value = false;
-  console.log('showWizard after skip:', showWizard.value);
+  
+  try {
+    wizardManuallyDismissed.value = true;
+    await api.post('/user/skip-wizard');
+    await authStore.fetchUser();
+    localStorage.setItem('hasCompletedWizard', 'true');
+    localStorage.removeItem('forceDashboard');
+  } catch (error) {
+    console.error('Failed to skip wizard:', error);
+  }
 };
 
 // Define icons
@@ -706,11 +755,9 @@ const initExpensesChart = () => {
 onMounted(async () => {
   try {
     await authStore.fetchUser();
-    // Fetch deductibility summary after user data is loaded
+    checkWizardStatus();
     await fetchDeductibilitySummary();
-    // Fetch tax suggestions
     await fetchTaxSuggestions();
-    checkFirstTimeUser();
   } catch (error) {
     console.error('Failed to fetch user data:', error);
   } finally {
@@ -718,6 +765,18 @@ onMounted(async () => {
     setTimeout(() => {
       initExpensesChart();
     }, 100);
+  }
+});
+  
+watch(() => authStore.user, (newUser) => {
+  if (newUser) {
+    checkWizardStatus();
+  }
+}, { deep: true });
+
+watch(() => router.currentRoute.value.path, (newPath) => {
+  if (localStorage.getItem('forceDashboard') === 'true' && newPath !== '/') {
+    router.push('/');
   }
 });
 </script>

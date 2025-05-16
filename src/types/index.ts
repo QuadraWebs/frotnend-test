@@ -4,6 +4,7 @@ export interface User {
     email: string;
     created_at?: string;
     updated_at?: string;
+    data_filled?: boolean;
   }
   
   export interface LoginCredentials {

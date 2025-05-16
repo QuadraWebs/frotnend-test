@@ -2,8 +2,7 @@
   <div class="min-h-screen bg-gray-50">
     <app-header />
 
-    <tax-wizard v-if="shouldShowWizard" 
-      @complete="completeWizard" @skip="skipWizard"
+    <tax-wizard v-if="!shouldShowWizard" @complete="completeWizard" @skip="skipWizard"
       class="transition-all duration-300 ease-in-out" />
 
     <div class="py-4 sm:py-6">
@@ -66,8 +65,7 @@
                 </div>
 
                 <div class="mt-4">
-                  <button
-                    @click="navigateToReceiptFiling"
+                  <button @click="navigateToReceiptFiling"
                     class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out">
                     File Taxes
                   </button>
@@ -86,153 +84,115 @@
 
             <!-- Expenses Summary -->
             <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-  <div class="px-4 py-3 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-900">Expenses Summary</h3>
-  </div>
-  <div class="px-4 py-3">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <!-- Chart -->
-      <div class="bg-white rounded-lg p-3 h-64">
-        <canvas ref="expensesChart"></canvas>
-      </div>
-      
-      <!-- Expense Categories -->
-      <div class="grid grid-cols-1 gap-3">
-        <!-- Fully Deductible -->
-        <div class="bg-green-50 rounded-lg p-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center mb-2">
-              <div class="bg-green-500 text-white p-1.5 rounded-md">
-                <CheckCircleIcon class="h-4 w-4" />
-              </div>
-              <h4 class="ml-2 text-xs font-medium text-gray-900">Fully Deductible</h4>
-            </div>
-            <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-              {{ taxData.expensesSummary.fullyDeductible > 0 ? 
-                 Math.round(taxData.expensesSummary.fullyDeductible / 
-                 (taxData.expensesSummary.fullyDeductible + 
-                  taxData.expensesSummary.partiallyDeductible + 
-                  taxData.expensesSummary.nonDeductible) * 100) + '%' : '0%' }}
-            </span>
-          </div>
-          <p class="text-base font-semibold text-gray-900">
-            {{formatCurrency(taxData.expensesSummary.fullyDeductible) }}
-          </p>
-          <div class="mt-1 flex items-center text-xs text-gray-600">
-            <span>{{ taxData.expensesSummary.fullyDeductibleCount || 0 }} items</span>
-            <span class="mx-1">•</span>
-            <span>Expenses that qualify as tax deductions</span>
-          </div>
-        </div>
-        
-        <!-- Partially Deductible -->
-        <div class="bg-yellow-50 rounded-lg p-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center mb-2">
-              <div class="bg-yellow-500 text-white p-1.5 rounded-md">
-                <QuestionMarkCircleIcon class="h-4 w-4" />
-              </div>
-              <h4 class="ml-2 text-xs font-medium text-gray-900">Partially Deductible</h4>
-            </div>
-            <span class="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
-              {{ taxData.expensesSummary.partiallyDeductible > 0 ? 
-                 Math.round(taxData.expensesSummary.partiallyDeductible / 
-                 (taxData.expensesSummary.fullyDeductible + 
-                  taxData.expensesSummary.partiallyDeductible + 
-                  taxData.expensesSummary.nonDeductible) * 100) + '%' : '0%' }}
-            </span>
-          </div>
-          <p class="text-base font-semibold text-gray-900">
-            {{formatCurrency(taxData.expensesSummary.partiallyDeductible) }}
-          </p>
-          <div class="mt-1 flex items-center text-xs text-gray-600">
-            <span>{{ taxData.expensesSummary.partiallyDeductibleCount || 0 }} items</span>
-            <span class="mx-1">•</span>
-            <span>Expenses that may qualify with documentation</span>
-          </div>
-        </div>
-        
-        <!-- Non-Deductible -->
-        <div class="bg-red-50 rounded-lg p-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center mb-2">
-              <div class="bg-red-500 text-white p-1.5 rounded-md">
-                <XCircleIcon class="h-4 w-4" />
-              </div>
-              <h4 class="ml-2 text-xs font-medium text-gray-900">Non-Deductible</h4>
-            </div>
-            <span class="text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-              {{ taxData.expensesSummary.nonDeductible > 0 ? 
-                 Math.round(taxData.expensesSummary.nonDeductible / 
-                 (taxData.expensesSummary.fullyDeductible + 
-                  taxData.expensesSummary.partiallyDeductible + 
-                  taxData.expensesSummary.nonDeductible) * 100) + '%' : '0%' }}
-            </span>
-          </div>
-          <p class="text-base font-semibold text-gray-900">
-            {{formatCurrency(taxData.expensesSummary.nonDeductible) }}
-          </p>
-          <div class="mt-1 flex items-center text-xs text-gray-600">
-            <span>{{ taxData.expensesSummary.nonDeductibleCount || 0 }} items</span>
-            <span class="mx-1">•</span>
-            <span>Expenses that don't qualify for tax deductions</span>
-          </div>
-        </div>
-        
-        <!-- Total Expenses -->
-        <div class="bg-gray-50 rounded-lg p-3 border-t border-gray-200">
-          <div class="flex items-center justify-between">
-            <h4 class="text-sm font-medium text-gray-900">Total Expenses</h4>
-            <p class="text-base font-bold text-gray-900">
-              {{formatCurrency(
-                taxData.expensesSummary.fullyDeductible + 
-                taxData.expensesSummary.partiallyDeductible + 
-                taxData.expensesSummary.nonDeductible
-              )}}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-            <!-- Tax filing deadlines -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
               <div class="px-4 py-3 border-b border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-900">
-                  Upcoming Tax Deadlines
-                </h3>
+                <h3 class="text-sm font-semibold text-gray-900">Expenses Summary</h3>
               </div>
-              <ul class="divide-y divide-gray-100">
-                <li v-for="(deadline, index) in taxData.upcomingDeadlines" :key="index"
-                  class="transition-colors duration-200 hover:bg-gray-50">
-                  <div class="px-4 py-3">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                          <CalendarIcon class="h-4 w-4 text-indigo-500" />
+              <div class="px-4 py-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <!-- Chart -->
+                  <div class="bg-white rounded-lg p-3 h-64">
+                    <canvas ref="expensesChart"></canvas>
+                  </div>
+
+                  <!-- Expense Categories -->
+                  <div class="grid grid-cols-1 gap-3">
+                    <!-- Fully Deductible -->
+                    <div class="bg-green-50 rounded-lg p-3">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center mb-2">
+                          <div class="bg-green-500 text-white p-1.5 rounded-md">
+                            <CheckCircleIcon class="h-4 w-4" />
+                          </div>
+                          <h4 class="ml-2 text-xs font-medium text-gray-900">Fully Deductible</h4>
                         </div>
-                        <div class="ml-3">
-                          <p class="text-xs font-medium text-indigo-600 truncate">
-                            {{ deadline.name }}
-                          </p>
-                          <p class="text-xs text-gray-500">
-                            Due: {{ deadline.date }}
-                          </p>
-                        </div>
-                      </div>
-                      <div>
-                        <span class="px-2 py-1 text-xs font-medium rounded-full"
-                          :class="deadline.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
-                          {{ deadline.status }}
+                        <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                          {{ taxData.expensesSummary.fullyDeductible > 0 ?
+                            Math.round(taxData.expensesSummary.fullyDeductible /
+                              (taxData.expensesSummary.fullyDeductible +
+                                taxData.expensesSummary.partiallyDeductible +
+                                taxData.expensesSummary.nonDeductible) * 100) + '%' : '0%' }}
                         </span>
+                      </div>
+                      <p class="text-base font-semibold text-gray-900">
+                        {{ formatCurrency(taxData.expensesSummary.fullyDeductible) }}
+                      </p>
+                      <div class="mt-1 flex items-center text-xs text-gray-600">
+                        <span>{{ taxData.expensesSummary.fullyDeductibleCount || 0 }} items</span>
+                        <span class="mx-1">•</span>
+                        <span>Expenses that qualify as tax deductions</span>
+                      </div>
+                    </div>
+
+                    <!-- Partially Deductible -->
+                    <div class="bg-yellow-50 rounded-lg p-3">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center mb-2">
+                          <div class="bg-yellow-500 text-white p-1.5 rounded-md">
+                            <QuestionMarkCircleIcon class="h-4 w-4" />
+                          </div>
+                          <h4 class="ml-2 text-xs font-medium text-gray-900">Partially Deductible</h4>
+                        </div>
+                        <span class="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
+                          {{ taxData.expensesSummary.partiallyDeductible > 0 ?
+                            Math.round(taxData.expensesSummary.partiallyDeductible /
+                              (taxData.expensesSummary.fullyDeductible +
+                                taxData.expensesSummary.partiallyDeductible +
+                                taxData.expensesSummary.nonDeductible) * 100) + '%' : '0%' }}
+                        </span>
+                      </div>
+                      <p class="text-base font-semibold text-gray-900">
+                        {{ formatCurrency(taxData.expensesSummary.partiallyDeductible) }}
+                      </p>
+                      <div class="mt-1 flex items-center text-xs text-gray-600">
+                        <span>{{ taxData.expensesSummary.partiallyDeductibleCount || 0 }} items</span>
+                        <span class="mx-1">•</span>
+                        <span>Expenses that may qualify with documentation</span>
+                      </div>
+                    </div>
+
+                    <!-- Non-Deductible -->
+                    <div class="bg-red-50 rounded-lg p-3">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center mb-2">
+                          <div class="bg-red-500 text-white p-1.5 rounded-md">
+                            <XCircleIcon class="h-4 w-4" />
+                          </div>
+                          <h4 class="ml-2 text-xs font-medium text-gray-900">Non-Deductible</h4>
+                        </div>
+                        <span class="text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                          {{ taxData.expensesSummary.nonDeductible > 0 ?
+                            Math.round(taxData.expensesSummary.nonDeductible /
+                              (taxData.expensesSummary.fullyDeductible +
+                                taxData.expensesSummary.partiallyDeductible +
+                                taxData.expensesSummary.nonDeductible) * 100) + '%' : '0%' }}
+                        </span>
+                      </div>
+                      <p class="text-base font-semibold text-gray-900">
+                        {{ formatCurrency(taxData.expensesSummary.nonDeductible) }}
+                      </p>
+                      <div class="mt-1 flex items-center text-xs text-gray-600">
+                        <span>{{ taxData.expensesSummary.nonDeductibleCount || 0 }} items</span>
+                        <span class="mx-1">•</span>
+                        <span>Expenses that don't qualify for tax deductions</span>
+                      </div>
+                    </div>
+
+                    <!-- Total Expenses -->
+                    <div class="bg-gray-50 rounded-lg p-3 border-t border-gray-200">
+                      <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-medium text-gray-900">Total Expenses</h4>
+                        <p class="text-base font-bold text-gray-900">
+                          {{ formatCurrency(
+                            taxData.expensesSummary.fullyDeductible +
+                            taxData.expensesSummary.partiallyDeductible +
+                            taxData.expensesSummary.nonDeductible
+                          )}}
+                        </p>
                       </div>
                     </div>
                   </div>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
 
             <!-- Recent transactions -->
@@ -266,45 +226,39 @@
               </div>
             </div>
 
-         <!-- Tax Savings Opportunities -->
-<div class="bg-white overflow-hidden shadow-sm rounded-lg">
-  <div class="px-4 py-3 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-900">
-      Tax Savings Suggestions
-    </h3>
-  </div>
-  <div class="px-4 py-3">
-    <div v-if="loadingSuggestions" class="flex justify-center py-4">
-      <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-        </path>
-      </svg>
-    </div>
-    <div v-else-if="taxSuggestions.length === 0" class="text-center py-4">
-      <p class="text-sm text-gray-500">No tax savings suggestions available at this time.</p>
-    </div>
-    <div v-else class="space-y-3">
-      <div v-for="(tip, index) in taxSuggestions" :key="index"
-        class="flex p-2 rounded-lg bg-yellow-50">
-        <div class="flex-shrink-0">
-          <LightbulbIcon class="h-4 w-4 text-yellow-500" />
-        </div>
-        <div class="ml-3">
-          <h4 class="text-xs font-medium text-gray-900">{{ tip.title }}</h4>
-          <p class="mt-0.5 text-xs text-gray-600">{{ tip.description }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-            <!-- User profile -->
-            <!-- <div>
-              <user-profile :user="authStore.user" />
-            </div> -->
+            <!-- Tax Savings Opportunities -->
+            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+              <div class="px-4 py-3 border-b border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-900">
+                  Tax Savings Suggestions
+                </h3>
+              </div>
+              <div class="px-4 py-3">
+                <div v-if="loadingSuggestions" class="flex justify-center py-4">
+                  <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                </div>
+                <div v-else-if="taxSuggestions.length === 0" class="text-center py-4">
+                  <p class="text-sm text-gray-500">No tax savings suggestions available at this time.</p>
+                </div>
+                <div v-else class="space-y-3">
+                  <div v-for="(tip, index) in taxSuggestions" :key="index" class="flex p-2 rounded-lg bg-yellow-50">
+                    <div class="flex-shrink-0">
+                      <LightbulbIcon class="h-4 w-4 text-yellow-500" />
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="text-xs font-medium text-gray-900">{{ tip.title }}</h4>
+                      <p class="mt-0.5 text-xs text-gray-600">{{ tip.description }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -321,7 +275,7 @@ import StatsCard from '@/components/dashboard/StatsCard.vue';
 import UserProfile from '@/components/dashboard/UserProfile.vue';
 import TaxWizard from '@/components/onboarding/TaxWizard.vue';
 import Chart from 'chart.js/auto';
-import api from '@/services/api'; 
+import api from '@/services/api';
 
 const taxSuggestions = ref([]);
 const loadingSuggestions = ref(true);
@@ -340,9 +294,9 @@ const navigateToReceiptFiling = () => {
 
 const shouldShowWizard = computed(() => {
   if (!userDataLoaded.value) return false;
-  
+
   if (wizardManuallyDismissed.value) return false;
-  
+
   // Show if data_filled is explicitly false
   return authStore.user && authStore.user.data_filled === false;
 });
@@ -362,9 +316,9 @@ const fetchTaxSuggestions = async () => {
 
 const checkWizardStatus = () => {
   console.log('Checking wizard status, data_filled:', authStore.user?.data_filled);
-  
+
   userDataLoaded.value = true;
-  
+
   if (authStore.user && authStore.user.data_filled === false) {
     console.log('User needs to complete wizard');
     localStorage.setItem('forceDashboard', 'true');
@@ -385,18 +339,18 @@ const checkFirstTimeUser = () => {
 
 const completeWizard = async (formData) => {
   console.log('Wizard completed with data:', formData);
-  
+
   try {
     await api.post('/user/complete-wizard', formData);
-    
+
     wizardManuallyDismissed.value = true;
-    
+
     await authStore.fetchUser();
-    
+
     localStorage.setItem('hasCompletedWizard', 'true');
-    
+
     localStorage.removeItem('forceDashboard');
-    
+
     await fetchDeductibilitySummary();
     await fetchTaxSuggestions();
   } catch (error) {
@@ -406,7 +360,7 @@ const completeWizard = async (formData) => {
 
 const skipWizard = async () => {
   console.log('Wizard skipped');
-  
+
   try {
     wizardManuallyDismissed.value = true;
     await api.post('/user/skip-wizard');
@@ -636,7 +590,7 @@ const fetchDeductibilitySummary = async () => {
   try {
     const response = await api.get('/dashboard/deductibility-summary');
     const data = response.data;
-    
+
     // Map the backend data to our frontend structure
     const deductionsSummary = {
       fullyDeductible: 0,
@@ -648,7 +602,7 @@ const fetchDeductibilitySummary = async () => {
       unassigned: 0,
       unassignedCount: 0
     };
-    
+
     // Process each category from the summary array
     data.summary.forEach((item) => {
       if (item.deductibility_name === "Fully Deductible") {
@@ -665,16 +619,16 @@ const fetchDeductibilitySummary = async () => {
         deductionsSummary.unassignedCount = parseInt(item.item_count) || 0;
       }
     });
-    
+
     // Update the tax data with the fetched information
     taxData.value.expensesSummary = deductionsSummary;
-    
+
     // Also update the total deductions amount (fully + partially deductible)
     taxData.value.deductions = deductionsSummary.fullyDeductible + deductionsSummary.partiallyDeductible;
-    
+
     // Initialize or update the chart with the new data
     initExpensesChart();
-    
+
   } catch (error) {
     console.error('Failed to fetch deductibility summary:', error);
   }
@@ -707,7 +661,7 @@ const initExpensesChart = () => {
     'rgba(202, 138, 4, 1)',     // Yellow border
     'rgba(220, 38, 38, 1)'      // Red border
   ];
-  
+
 
   const data = {
     labels: labels,
@@ -767,7 +721,7 @@ onMounted(async () => {
     }, 100);
   }
 });
-  
+
 watch(() => authStore.user, (newUser) => {
   if (newUser) {
     checkWizardStatus();

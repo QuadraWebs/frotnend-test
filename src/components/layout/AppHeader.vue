@@ -12,10 +12,10 @@
               :class="{ 'border-indigo-500 text-gray-900': $route.path === '/' }">
               Dashboard
             </router-link>
-            <router-link to="/quotation-invoice"
+            <router-link to="/income"
               class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              :class="{ 'border-indigo-500 text-gray-900': $route.path === '/quo tation-invoice' }">
-              Quotation + Invoice
+              :class="{ 'border-indigo-500 text-gray-900': $route.path === '/income' }">
+             Income
             </router-link>
             <router-link to="/receipts"
               class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"

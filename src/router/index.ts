@@ -5,7 +5,8 @@ import Register from '@/views/Register.vue';
 import ReceiptFiling from '@/views/ReceiptFiling.vue';
 import Expenses from '@/views/Expenses.vue';
 import IncomeSummaryReport from '@/views/IncomeSummaryReport.vue';
-import QuotationInvoice from '../views/QuotationInvoice.vue'
+import QuotationInvoice from '@/views/QuotationInvoice.vue';
+import IncomeManagement from '@/views/IncomeManagement.vue';
 
 const routes = [
   {
@@ -50,6 +51,15 @@ const routes = [
     meta: {
       requiresAuth: true,
       title: 'Income Summary Report'
+    }
+  },
+  {
+    path: '/income',
+    name: 'IncomeManagement',
+    component: IncomeManagement,
+    meta: { 
+      requiresAuth: true,
+      title: 'Income Management'
     }
   }
 ];

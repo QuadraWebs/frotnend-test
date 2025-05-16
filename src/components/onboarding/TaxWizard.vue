@@ -21,10 +21,9 @@
                 <div class="bg-indigo-600 h-1.5 transition-all duration-500 ease-in-out"
                     :style="{ width: `${(currentStep / totalSteps) * 100}%` }"></div>
             </div>
-
-            <!-- Content -->
+            
             <div class="p-6 overflow-y-auto max-h-[calc(100vh-130px)] sm:max-h-[calc(90vh-130px)]">
-                <!-- Step 1: Welcome -->
+
                 <div v-if="currentStep === 1" class="space-y-6 transition-opacity duration-300">
                     <div class="text-center">
                         <div class="bg-indigo-100 rounded-full p-4 inline-flex items-center justify-center mb-4">
@@ -44,197 +43,7 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Personal and Work Information -->
                 <div v-else-if="currentStep === 2" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Personal and Work Information</h3>
-                    <p class="text-sm text-gray-500">Tell us about your work environment to help identify potential
-                        deductions.</p>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Do you work from home or in an
-                                office?</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div v-for="option in workLocations" :key="option.value"
-                                    @click="formData.workLocation = option.value"
-                                    class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200"
-                                    :class="formData.workLocation === option.value ?
-                                        'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-500 ring-opacity-30' :
-                                        'border-gray-200 hover:border-indigo-300'">
-                                    <input type="radio" :id="option.value" name="workLocation" :value="option.value"
-                                        v-model="formData.workLocation" class="sr-only" />
-                                    <label :for="option.value"
-                                        class="cursor-pointer flex flex-col items-center text-center">
-                                        <span v-if="option.value === 'home'" class="text-2xl mb-2">🏠</span>
-                                        <span v-else-if="option.value === 'office'" class="text-2xl mb-2">🏢</span>
-                                        <span v-else class="text-2xl mb-2">🏠/🏢</span>
-                                        <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
-                                    </label>
-                                    <div v-if="formData.workLocation === option.value"
-                                        class="absolute -top-2 -right-2 bg-indigo-500 rounded-full p-1">
-                                        <CheckIcon class="h-4 w-4 text-white" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Travel for Business -->
-                <div v-else-if="currentStep === 3" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Travel for Business</h3>
-                    <p class="text-sm text-gray-500">Do you travel for business purposes? Select all that apply.</p>
-
-                    <div class="space-y-3">
-                        <div v-for="option in travelOptions" :key="option.value"
-                            @click="formData.businessTravel = option.value"
-                            class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200 flex items-center"
-                            :class="formData.businessTravel === option.value ?
-                                'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-500 ring-opacity-30' :
-                                'border-gray-200 hover:border-indigo-300'">
-                            <input type="radio" :id="option.value" name="businessTravel" :value="option.value"
-                                v-model="formData.businessTravel" class="sr-only" />
-
-                            <div class="mr-3">
-                                <span v-if="option.value === 'personal_vehicle'" class="text-xl">🚗</span>
-                                <span v-else-if="option.value === 'rideshare'" class="text-xl">🚕</span>
-                                <span v-else-if="option.value === 'flights'" class="text-xl">✈️</span>
-                                <span v-else class="text-xl">🚫</span>
-                            </div>
-
-                            <label :for="option.value" class="cursor-pointer flex-1">
-                                <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
-                            </label>
-
-                            <div v-if="formData.businessTravel === option.value"
-                                class="bg-indigo-500 rounded-full h-5 w-5 flex items-center justify-center">
-                                <CheckIcon class="h-3 w-3 text-white" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Business Meals -->
-                <div v-else-if="currentStep === 4" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Business Meals</h3>
-                    <p class="text-sm text-gray-500">How often do you have business meals?</p>
-
-                    <div class="space-y-3">
-                        <div v-for="option in mealFrequencyOptions" :key="option.value"
-                            @click="formData.businessMeals = option.value"
-                            class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200 flex items-center"
-                            :class="formData.businessMeals === option.value ?
-                                'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-500 ring-opacity-30' :
-                                'border-gray-200 hover:border-indigo-300'">
-                            <input type="radio" :id="option.value" name="businessMeals" :value="option.value"
-                                v-model="formData.businessMeals" class="sr-only" />
-
-                            <div class="mr-3">
-                                <span v-if="option.value === 'mostly'" class="text-xl">🍽️</span>
-                                <span v-else-if="option.value === 'sometimes'" class="text-xl">🍲</span>
-                                <span v-else-if="option.value === 'rarely'" class="text-xl">🥪</span>
-                                <span v-else class="text-xl">❌</span>
-                            </div>
-
-                            <label :for="option.value" class="cursor-pointer flex-1">
-                                <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
-                            </label>
-
-                            <div v-if="formData.businessMeals === option.value"
-                                class="bg-indigo-500 rounded-full h-5 w-5 flex items-center justify-center">
-                                <CheckIcon class="h-3 w-3 text-white" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 5: Personal Deductions -->
-                <div v-else-if="currentStep === 5" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Personal Deductions</h3>
-                    <p class="text-sm text-gray-500">Which of these personal deductions apply to you? Select all that
-                        apply.</p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div v-for="option in personalDeductionOptions" :key="option.value"
-                            @click="toggleDeduction(option.value)"
-                            class="relative border rounded-lg p-3 cursor-pointer transition-all duration-200 flex items-center"
-                            :class="formData.personalDeductions.includes(option.value) ?
-                                'bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500' :
-                                'border-gray-200 hover:border-indigo-300'">
-                            <input type="checkbox" :id="option.value" :value="option.value"
-                                v-model="formData.personalDeductions" class="sr-only" />
-
-                            <label :for="option.value" class="cursor-pointer flex-1">
-                                <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
-                            </label>
-
-                            <div v-if="formData.personalDeductions.includes(option.value)"
-                                class="bg-indigo-500 rounded-full h-5 w-5 flex items-center justify-center">
-                                <CheckIcon class="h-3 w-3 text-white" />
-                            </div>
-                            <div v-else class="border border-gray-300 rounded-full h-5 w-5"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 6: Profession -->
-                <div v-else-if="currentStep === 6" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Your Profession</h3>
-                    <p class="text-sm text-gray-500">What is your profession? This helps us identify industry-specific
-                        deductions.</p>
-
-                    <div class="mt-4">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <BriefcaseIcon class="h-5 w-5 text-gray-400" />
-                            </div>
-                            <input type="text" v-model="formData.profession"
-                                class="pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
-                                placeholder="e.g. Software Developer, Graphic Designer, Consultant" />
-                        </div>
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            <button v-for="suggestion in professionSuggestions" :key="suggestion"
-                                @click="formData.profession = suggestion"
-                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-indigo-100 transition-colors duration-150">
-                                {{ suggestion }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 7: AI Scanning -->
-                <div v-else-if="currentStep === 7" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Find My Deductions</h3>
-                    <p class="text-sm text-gray-500">Our AI can scan your financial documents to automatically find
-                        deductions.</p>
-
-                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-5 rounded-xl border border-indigo-200">
-                        <h4 class="text-sm font-medium text-indigo-800 flex items-center">
-                            <SparklesIcon class="h-5 w-5 mr-2 text-indigo-500" />
-                            Deduction Categories
-                        </h4>
-                        <ul class="mt-3 text-sm text-indigo-700 space-y-2">
-                            <li class="flex items-center bg-white bg-opacity-60 p-2 rounded-lg">
-                                <CheckIcon class="h-4 w-4 mr-2 text-green-500" /> Home Office Expenses
-                            </li>
-                            <li class="flex items-center bg-white bg-opacity-60 p-2 rounded-lg">
-                                <CheckIcon class="h-4 w-4 mr-2 text-green-500" /> Professional Development
-                            </li>
-                            <li class="flex items-center bg-white bg-opacity-60 p-2 rounded-lg">
-                                <CheckIcon class="h-4 w-4 mr-2 text-green-500" /> Business Travel
-                            </li>
-                            <li class="flex items-center bg-white bg-opacity-60 p-2 rounded-lg">
-                                <CheckIcon class="h-4 w-4 mr-2 text-green-500" /> Equipment & Supplies
-                            </li>
-                            <li class="flex items-center bg-white bg-opacity-60 p-2 rounded-lg">
-                                <CheckIcon class="h-4 w-4 mr-2 text-green-500" /> Health Insurance Premiums
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 8: Legal Name -->
-                <div v-else-if="currentStep === 8" class="space-y-6 transition-opacity duration-300">
                     <h3 class="text-lg font-semibold text-gray-900">Personal Information</h3>
                     <p class="text-sm text-gray-500">Please provide your identification details as they appear on official documents.</p>
 
@@ -291,49 +100,167 @@
                     </div>
                 </div>
 
-                <!-- Step 9: Connect Statements -->
-                <div v-else-if="currentStep === 9" class="space-y-6 transition-opacity duration-300">
-                    <h3 class="text-lg font-semibold text-gray-900">Let AI Fetch Your Deductions</h3>
-                    <p class="text-sm text-gray-500">Choose how you'd like to provide your financial statements.</p>
+                <!-- Step 3: Personal and Work Information -->
+                <div v-else-if="currentStep === 3" class="space-y-6 transition-opacity duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900">Personal and Work Information</h3>
+                    <p class="text-sm text-gray-500">Tell us about your work environment to help identify potential
+                        deductions.</p>
 
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
-                        <div class="border rounded-xl p-5 cursor-pointer transition-all duration-200 transform hover:scale-105"
-                            :class="{ 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500 ring-opacity-30': formData.statementMethod === 'connect' }"
-                            @click="formData.statementMethod = 'connect'">
-                            <div class="flex flex-col items-center text-center">
-                                <div class="bg-indigo-100 rounded-full p-3 mb-3">
-                                    <LinkIcon class="h-6 w-6 text-indigo-600" />
-                                </div>
-                                <h4 class="text-sm font-medium text-gray-900">Connect Your Statements</h4>
-                                <p class="text-xs text-gray-500 mt-2">Securely connect your bank and credit card
-                                    accounts</p>
-                                <div v-if="formData.statementMethod === 'connect'"
-                                    class="mt-3 bg-indigo-500 text-white text-xs px-3 py-1 rounded-full">
-                                    Selected
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border rounded-xl p-5 cursor-pointer transition-all duration-200 transform hover:scale-105"
-                            :class="{ 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500 ring-opacity-30': formData.statementMethod === 'email' }"
-                            @click="formData.statementMethod = 'email'">
-                            <div class="flex flex-col items-center text-center">
-                                <div class="bg-indigo-100 rounded-full p-3 mb-3">
-                                    <MailIcon class="h-6 w-6 text-indigo-600" />
-                                </div>
-                                <h4 class="text-sm font-medium text-gray-900">Email Your Statements</h4>
-                                <p class="text-xs text-gray-500 mt-2">Upload or email your statements to us</p>
-                                <div v-if="formData.statementMethod === 'email'"
-                                    class="mt-3 bg-indigo-500 text-white text-xs px-3 py-1 rounded-full">
-                                    Selected
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Do you work from home or in an
+                                office?</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div v-for="option in workLocations" :key="option.value"
+                                    @click="formData.workLocation = option.value"
+                                    class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200"
+                                    :class="formData.workLocation === option.value ?
+                                        'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-500 ring-opacity-30' :
+                                        'border-gray-200 hover:border-indigo-300'">
+                                    <input type="radio" :id="option.value" name="workLocation" :value="option.value"
+                                        v-model="formData.workLocation" class="sr-only" />
+                                    <label :for="option.value"
+                                        class="cursor-pointer flex flex-col items-center text-center">
+                                        <span v-if="option.value === 'home'" class="text-2xl mb-2">🏠</span>
+                                        <span v-else-if="option.value === 'office'" class="text-2xl mb-2">🏢</span>
+                                        <span v-else class="text-2xl mb-2">🏠/🏢</span>
+                                        <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
+                                    </label>
+                                    <div v-if="formData.workLocation === option.value"
+                                        class="absolute -top-2 -right-2 bg-indigo-500 rounded-full p-1">
+                                        <CheckIcon class="h-4 w-4 text-white" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 10: Completion -->
-                <div v-else-if="currentStep === 10" class="space-y-6 text-center transition-opacity duration-300">
+                <!-- Step 4: Travel for Business -->
+                <div v-else-if="currentStep === 4" class="space-y-6 transition-opacity duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900">Travel for Business</h3>
+                    <p class="text-sm text-gray-500">Do you travel for business purposes? Select all that apply.</p>
+
+                    <div class="space-y-3">
+                        <div v-for="option in travelOptions" :key="option.value"
+                            @click="formData.businessTravel = option.value"
+                            class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200 flex items-center"
+                            :class="formData.businessTravel === option.value ?
+                                'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-500 ring-opacity-30' :
+                                'border-gray-200 hover:border-indigo-300'">
+                            <input type="radio" :id="option.value" name="businessTravel" :value="option.value"
+                                v-model="formData.businessTravel" class="sr-only" />
+
+                            <div class="mr-3">
+                                <span v-if="option.value === 'personal_vehicle'" class="text-xl">🚗</span>
+                                <span v-else-if="option.value === 'rideshare'" class="text-xl">🚕</span>
+                                <span v-else-if="option.value === 'flights'" class="text-xl">✈️</span>
+                                <span v-else class="text-xl">🚫</span>
+                            </div>
+
+                            <label :for="option.value" class="cursor-pointer flex-1">
+                                <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
+                            </label>
+
+                            <div v-if="formData.businessTravel === option.value"
+                                class="bg-indigo-500 rounded-full h-5 w-5 flex items-center justify-center">
+                                <CheckIcon class="h-3 w-3 text-white" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Business Meals -->
+                <div v-else-if="currentStep === 5" class="space-y-6 transition-opacity duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900">Business Meals</h3>
+                    <p class="text-sm text-gray-500">How often do you have business meals?</p>
+
+                    <div class="space-y-3">
+                        <div v-for="option in mealFrequencyOptions" :key="option.value"
+                            @click="formData.businessMeals = option.value"
+                            class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200 flex items-center"
+                            :class="formData.businessMeals === option.value ?
+                                'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-500 ring-opacity-30' :
+                                'border-gray-200 hover:border-indigo-300'">
+                            <input type="radio" :id="option.value" name="businessMeals" :value="option.value"
+                                v-model="formData.businessMeals" class="sr-only" />
+
+                            <div class="mr-3">
+                                <span v-if="option.value === 'mostly'" class="text-xl">🍽️</span>
+                                <span v-else-if="option.value === 'sometimes'" class="text-xl">🍲</span>
+                                <span v-else-if="option.value === 'rarely'" class="text-xl">🥪</span>
+                                <span v-else class="text-xl">❌</span>
+                            </div>
+
+                            <label :for="option.value" class="cursor-pointer flex-1">
+                                <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
+                            </label>
+
+                            <div v-if="formData.businessMeals === option.value"
+                                class="bg-indigo-500 rounded-full h-5 w-5 flex items-center justify-center">
+                                <CheckIcon class="h-3 w-3 text-white" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Personal Deductions -->
+                <div v-else-if="currentStep === 6" class="space-y-6 transition-opacity duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900">Personal Deductions</h3>
+                    <p class="text-sm text-gray-500">Which of these personal deductions apply to you? Select all that
+                        apply.</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div v-for="option in personalDeductionOptions" :key="option.value"
+                            @click="toggleDeduction(option.value)"
+                            class="relative border rounded-lg p-3
+                                                        cursor-pointer transition-all duration-200 flex items-center"
+                            :class="formData.personalDeductions.includes(option.value) ?
+                                'bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500' :
+                                'border-gray-200 hover:border-indigo-300'">
+                            <input type="checkbox" :id="option.value" :value="option.value"
+                                v-model="formData.personalDeductions" class="sr-only" />
+
+                            <label :for="option.value" class="cursor-pointer flex-1">
+                                <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
+                            </label>
+
+                            <div v-if="formData.personalDeductions.includes(option.value)"
+                                class="bg-indigo-500 rounded-full h-5 w-5 flex items-center justify-center">
+                                <CheckIcon class="h-3 w-3 text-white" />
+                            </div>
+                            <div v-else class="border border-gray-300 rounded-full h-5 w-5"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 7: Profession -->
+                <div v-else-if="currentStep === 7" class="space-y-6 transition-opacity duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900">Your Profession</h3>
+                    <p class="text-sm text-gray-500">What is your profession? This helps us identify industry-specific
+                        deductions.</p>
+
+                    <div class="mt-4">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <BriefcaseIcon class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input type="text" v-model="formData.profession"
+                                class="pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                placeholder="e.g. Software Developer, Graphic Designer, Consultant" />
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button v-for="suggestion in professionSuggestions" :key="suggestion"
+                                @click="formData.profession = suggestion"
+                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-indigo-100 transition-colors duration-150">
+                                {{ suggestion }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 8: Completion -->
+                <div v-else-if="currentStep === 8" class="space-y-6 text-center transition-opacity duration-300">
                     <div
                         class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 animate-pulse">
                         <CheckIcon class="h-10 w-10 text-green-600" />
@@ -531,7 +458,7 @@ const SparklesIcon = defineComponent({
             'stroke-linecap': 'round',
             'stroke-linejoin': 'round',
             'stroke-width': '2',
-            d: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z'
+            d: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L             13 21l-2.286-6.857L5 12l5.714-2.143L13 3z'
         })
     ])
 });
@@ -588,7 +515,7 @@ const emit = defineEmits(['complete', 'skip']);
 
 // State
 const currentStep = ref(1);
-const totalSteps = 10;
+const totalSteps = 8; // Reduced from 10 to 8 after removing 2 steps
 const isLoading = ref(false);
 const loadingMessage = ref('Processing your information...');
 const animateStep = ref(true);
@@ -618,7 +545,7 @@ const formData = ref({
     profession: '',
     nricName: '',
     nric: '',
-    tin: '',           // New TIN field
+    tin: '',           // TIN field
     phoneNumber: '',
     statementMethod: 'connect'
 });
@@ -711,15 +638,8 @@ const nextStep = () => {
         // Animate step transition
         animateStep.value = false;
         setTimeout(() => {
-            // Simulate loading for certain steps
-            if (currentStep.value === 6) {
-                simulateLoading('Analyzing your profession for potential deductions...', 1800);
-            } else if (currentStep.value === 8) {
-                simulateLoading('Verifying your information...', 1500);
-            } else {
-                currentStep.value++;
-                animateStep.value = true;
-            }
+            currentStep.value++;
+            animateStep.value = true;
         }, 150);
     }
 };
@@ -835,4 +755,4 @@ watch(currentStep, () => {
 }
 </style>
 
-  
+

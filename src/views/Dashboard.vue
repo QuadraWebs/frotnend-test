@@ -383,26 +383,26 @@ const checkFirstTimeUser = () => {
   showWizard.value = !hasCompletedWizard && !authStore.user?.data_filled;
 };
 
-const completeWizard = async (formData) => {
-  console.log('Wizard completed with data:', formData);
+// const completeWizard = async (formData) => {
+//   console.log('Wizard completed with data:', formData);
   
-  try {
-    await api.post('/user/complete-wizard', formData);
+//   try {
+//     await api.post('/user/complete-wizard', formData);
     
-    wizardManuallyDismissed.value = true;
+//     wizardManuallyDismissed.value = true;
     
-    await authStore.fetchUser();
+//     await authStore.fetchUser();
     
-    localStorage.setItem('hasCompletedWizard', 'true');
+//     localStorage.setItem('hasCompletedWizard', 'true');
     
-    localStorage.removeItem('forceDashboard');
+//     localStorage.removeItem('forceDashboard');
     
-    await fetchDeductibilitySummary();
-    await fetchTaxSuggestions();
-  } catch (error) {
-    console.error('Failed to complete wizard:', error);
-  }
-};
+//     await fetchDeductibilitySummary();
+//     await fetchTaxSuggestions();
+//   } catch (error) {
+//     console.error('Failed to complete wizard:', error);
+//   }
+// };
 
 const skipWizard = async () => {
   console.log('Wizard skipped');

@@ -33,12 +33,46 @@
                 <p class="mt-1 text-xs text-gray-600">
                   Here's an overview of your tax situation for the current tax year.
                 </p>
-                <div class="mt-2 flex flex-wrap items-center">
+                <!-- <div class="mt-2 flex flex-wrap items-center">
                   <span class="px-2 py-1 text-xs font-medium rounded-full mb-1 sm:mb-0"
                     :class="taxData.taxStatus === 'Up to date' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
                     {{ taxData.taxStatus }}
                   </span>
                   <span class="ml-0 sm:ml-2 text-xs text-gray-500 w-full sm:w-auto">Tax filing status</span>
+                </div> -->
+              </div>
+            </div>
+
+              <!-- Tax Savings Opportunities -->
+              <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+              <div class="px-4 py-3 border-b border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-900">
+                  Tax Savings Suggestions
+                </h3>
+              </div>
+              <div class="px-4 py-3">
+                <div v-if="loadingSuggestions" class="flex justify-center py-4">
+                  <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                </div>
+                <div v-else-if="taxSuggestions.length === 0" class="text-center py-4">
+                  <p class="text-sm text-gray-500">No tax savings suggestions available at this time.</p>
+                </div>
+                <div v-else class="space-y-3">
+                  <div v-for="(tip, index) in taxSuggestions" :key="index" class="flex p-2 rounded-lg bg-yellow-50">
+                    <div class="flex-shrink-0">
+                      <LightbulbIcon class="h-4 w-4 text-yellow-500" />
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="text-xs font-medium text-gray-900">{{ tip.title }}</h4>
+                      <p class="mt-0.5 text-xs text-gray-600">{{ tip.description }}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -196,7 +230,7 @@
             </div>
 
             <!-- Recent transactions -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <!-- <div class="bg-white overflow-hidden shadow-sm rounded-lg">
               <div class="px-4 py-3 border-b border-gray-100">
                 <h3 class="text-sm font-semibold text-gray-900">
                   Recent Income Transactions
@@ -224,41 +258,9 @@
                   </li>
                 </ul>
               </div>
-            </div>
+            </div> -->
 
-            <!-- Tax Savings Opportunities -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-              <div class="px-4 py-3 border-b border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-900">
-                  Tax Savings Suggestions
-                </h3>
-              </div>
-              <div class="px-4 py-3">
-                <div v-if="loadingSuggestions" class="flex justify-center py-4">
-                  <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                  </svg>
-                </div>
-                <div v-else-if="taxSuggestions.length === 0" class="text-center py-4">
-                  <p class="text-sm text-gray-500">No tax savings suggestions available at this time.</p>
-                </div>
-                <div v-else class="space-y-3">
-                  <div v-for="(tip, index) in taxSuggestions" :key="index" class="flex p-2 rounded-lg bg-yellow-50">
-                    <div class="flex-shrink-0">
-                      <LightbulbIcon class="h-4 w-4 text-yellow-500" />
-                    </div>
-                    <div class="ml-3">
-                      <h4 class="text-xs font-medium text-gray-900">{{ tip.title }}</h4>
-                      <p class="mt-0.5 text-xs text-gray-600">{{ tip.description }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          
           </div>
         </div>
       </main>

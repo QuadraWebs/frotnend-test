@@ -401,18 +401,9 @@ const reportData = ref({
   estimatedTax: 15600
 });
 
-// Computed properties
-const totalIncome = computed(() => {
-  return reportData.value.incomes.reduce((sum, income) => sum + income.amount, 0);
-});
-
-const totalDeductions = computed(() => {
-  return reportData.value.deductions.reduce((sum, deduction) => sum + deduction.amount, 0);
-});
-
-const taxableIncome = computed(() => {
-  return Math.max(0, totalIncome.value - totalDeductions.value);
-});
+const totalIncome = computed(() => reportData.value.totalIncome || 0);
+const totalDeductions = computed(() => reportData.value.totalDeductions || 0);
+const taxableIncome = computed(() => reportData.value.taxableIncome || 0);
 
 const effectiveTaxRate = computed(() => {
   if (taxableIncome.value === 0) return 0;
@@ -443,17 +434,20 @@ const calculatePercentage = (amount: number, total: number): string => {
   return ((amount / total) * 100).toFixed(1);
 };
 
-// Methods
 const fetchReportData = async () => {
   try {
     loading.value = true;
-    // In a real application, you would fetch data from your API
-    // const response = await api.get('/reports/income-summary');
-    // reportData.value = response.data;
+    const response = await api.get('/incomes/summary-report', {
+      params: {
+        taxYear: new Date().getFullYear().toString()
+      }
+    });
+
+    console.log('Report Data:', response.data);
     
-    // For demo purposes, we're using the sample data defined above
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (response.data.success) {
+      reportData.value = response.data.data;
+    }
   } catch (error) {
     console.error('Failed to fetch report data:', error);
   } finally {

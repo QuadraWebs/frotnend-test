@@ -8,5 +8,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'pinia', 'axios'],
+          'stores': ['./src/stores/auth.ts', './src/stores/chat.ts'],
+        }
+      }
+    }
   }
 })

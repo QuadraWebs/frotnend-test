@@ -89,7 +89,6 @@ export const useAuthStore = defineStore('auth', {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': csrfToken
           },
           withCredentials: false
         });

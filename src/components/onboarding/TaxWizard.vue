@@ -348,11 +348,11 @@
                     {{ currentStep === 1 ? 'Get Started' : 'Continue' }}
                     <ArrowRightIcon class="ml-2 h-4 w-4" />
                 </button>
-                <button v-else-if="currentStep === totalSteps && !isLoading" @click="completeWizard"
+                <!-- <button v-else-if="currentStep === totalSteps && !isLoading" @click="completeWizard"
                     class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 transform hover:scale-105 flex items-center">
                     Complete Setup
                     <CheckIcon class="ml-2 h-4 w-4" />
-                </button>
+                </button> -->
             </div>
         </div>
     </div>
@@ -523,7 +523,7 @@ const ArrowLeftIcon = defineComponent({
     ])
 });
 
-const emit = defineEmits(['complete', 'skip']);
+const emit = defineEmits(['complete', 'skip','close']);
 
 // State
 const currentStep = ref(1);
@@ -680,49 +680,44 @@ const simulateLoading = (message: string, duration: number) => {
 };
 
 const completeWizard = async () => {
-    console.log('Complete Form Data Object:', formData.value);
+  console.log('Complete Form Data Object:', formData.value);
+  
+  isLoading.value = true;
+  loadingMessage.value = 'Submitting your information...';
+  
+  try {
+    const apiFormData = new FormData();
+    Object.entries(formData.value).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        apiFormData.append(key, JSON.stringify(value));
+      } else {
+        apiFormData.append(key, value as string);
+      }
+    });
+
+    const response = await api.post('/user-preference', apiFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     
-    isLoading.value = true;
-    loadingMessage.value = 'Submitting your information...';
+    console.log('API Response:', response.data);
+    console.log('Emitting complete and close events');
     
-    try {
-        const apiFormData = new FormData();
-        
-        Object.entries(formData.value).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
-                apiFormData.append(key, JSON.stringify(value));
-            } else {
-                apiFormData.append(key, value as string);
-            }
-        });
-        
-        const response = await api.post('/user-preference', apiFormData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        
-        console.log('API Response:', response.data);
-        
-        loadingMessage.value = 'Finalizing your tax profile...';
-        
-        setTimeout(() => {
-            isLoading.value = false;
-            emit('complete', formData.value);
-        }, 1500);
-        
-    } catch (error) {
-        console.error('Error submitting form data:', error);
-        
-        // Show error message
-        loadingMessage.value = 'There was an error processing your information. Please try again.';
-        
-        // After a delay, reset loading state but stay on the current step
-        setTimeout(() => {
-            isLoading.value = false;
-        }, 2000);
-    }
+    loadingMessage.value = 'Finalizing your tax profile...';
+    isLoading.value = false;
+    
+    // Emit both events
+    emit('complete', formData.value);
+    emit('close');
+    
+  } catch (error) {
+    console.error('Error submitting form data:', error);
+    loadingMessage.value = 'There was an error processing your information. Please try again.';
+    isLoading.value = false;
+  }
 };
+
 
 const skipWizard = () => {
     emit('skip');

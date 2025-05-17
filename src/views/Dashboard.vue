@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50">
     <app-header />
 
-    <tax-wizard v-if="shouldShowWizard" @complete="completeWizard" @skip="skipWizard"
+    <tax-wizard v-if="shouldShowWizard" @complete="handleWizardComplete" @close="closeTaxWizard" @skip="closeTaxWizard"
       class="transition-all duration-300 ease-in-out" />
 
     <div class="py-4 sm:py-6">
@@ -43,8 +43,8 @@
               </div>
             </div>
 
-              <!-- Tax Savings Opportunities -->
-              <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <!-- Tax Savings Opportunities -->
+            <!-- <div class="bg-white overflow-hidden shadow-sm rounded-lg">
               <div class="px-4 py-3 border-b border-gray-100">
                 <h3 class="text-sm font-semibold text-gray-900">
                   Tax Savings Suggestions
@@ -75,7 +75,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- File Taxes with CPA Section -->
             <div class="bg-white overflow-hidden shadow-sm rounded-lg">
@@ -220,7 +220,7 @@
                             taxData.expensesSummary.fullyDeductible +
                             taxData.expensesSummary.partiallyDeductible +
                             taxData.expensesSummary.nonDeductible
-                          )}}
+                          ) }}
                         </p>
                       </div>
                     </div>
@@ -260,7 +260,7 @@
               </div>
             </div> -->
 
-          
+
           </div>
         </div>
       </main>
@@ -290,18 +290,28 @@ const wizardManuallyDismissed = ref(false);
 const expensesChart = ref<HTMLCanvasElement | null>(null);
 let chart: Chart | null = null;
 
+const closeTaxWizard = () => {
+  shouldShowWizard.value = false;
+  // Optional: Update user preferences or state here
+};
+
+const handleWizardComplete = (formData: any) => {
+  // Handle the form data if needed
+  closeTaxWizard();
+};
+
 const navigateToReceiptFiling = () => {
   window.open('https://mytax.hasil.gov.my/', '_blank');
 };
 
-const shouldShowWizard = computed(() => {
-  if (!userDataLoaded.value) return false;
+const shouldShowWizard = ref(false);
 
-  if (wizardManuallyDismissed.value) return false;
+const checkAndShowWizard = () => {
+  if (!userDataLoaded.value) return;
+  if (wizardManuallyDismissed.value) return;
 
-  // Show if data_filled is explicitly false
-  return authStore.user && authStore.user.data_filled === false;
-});
+  shouldShowWizard.value = authStore.user && authStore.user.data_filled === false;
+};
 
 const fetchTaxSuggestions = async () => {
   try {
@@ -339,26 +349,9 @@ const checkFirstTimeUser = () => {
   showWizard.value = !hasCompletedWizard && !authStore.user?.data_filled;
 };
 
-// const completeWizard = async (formData) => {
-//   console.log('Wizard completed with data:', formData);
-  
-//   try {
-//     await api.post('/user/complete-wizard', formData);
-    
-//     wizardManuallyDismissed.value = true;
-    
-//     await authStore.fetchUser();
-    
-//     localStorage.setItem('hasCompletedWizard', 'true');
-    
-//     localStorage.removeItem('forceDashboard');
-    
-//     await fetchDeductibilitySummary();
-//     await fetchTaxSuggestions();
-//   } catch (error) {
-//     console.error('Failed to complete wizard:', error);
-//   }
-// };
+const completeWizard = async (formData) => {
+  shouldShowWizard.value = false;
+};
 
 const skipWizard = async () => {
   console.log('Wizard skipped');
@@ -665,16 +658,16 @@ const fetchExpenseSummary = async () => {
     const response = await api.get('/get-expenses-summary', {
       params: { user_id: userId }
     });
-    
+
     console.log('Expense summary fetched successfully:', response.data);
-    
+
     // Update the tax data with the fetched expense summary
     if (response.data && typeof response.data === 'object') {
       // If the API returns the exact format we need
-      if ('fullyDeductible' in response.data && 
-          'partiallyDeductible' in response.data && 
-          'nonDeductible' in response.data) {
-        
+      if ('fullyDeductible' in response.data &&
+        'partiallyDeductible' in response.data &&
+        'nonDeductible' in response.data) {
+
         // Update the expense summary
         taxData.value.expensesSummary = {
           fullyDeductible: parseFloat(response.data.fullyDeductible || 0),
@@ -686,15 +679,17 @@ const fetchExpenseSummary = async () => {
           unassigned: 0,
           unassignedCount: 0
         };
-        
+
         // Also update the total deductions
-        taxData.value.deductions = parseFloat(response.data.fullyDeductible || 0) + 
-                                  parseFloat(response.data.partiallyDeductible || 0);
-      } 
+        taxData.value.deductions = parseFloat(response.data.fullyDeductible || 0) +
+          parseFloat(response.data.partiallyDeductible || 0);
+
+
+      }
       // If the API returns a nested format
       else if (response.data.summary) {
         const summary = response.data.summary;
-        
+
         taxData.value.expensesSummary = {
           fullyDeductible: parseFloat(summary.fullyDeductible || summary.fully_deductible || 0),
           partiallyDeductible: parseFloat(summary.partiallyDeductible || summary.partially_deductible || 0),
@@ -705,9 +700,11 @@ const fetchExpenseSummary = async () => {
           unassigned: 0,
           unassignedCount: 0
         };
-        
-        taxData.value.deductions = parseFloat(summary.fullyDeductible || summary.fully_deductible || 0) + 
-                                  parseFloat(summary.partiallyDeductible || summary.partially_deductible || 0);
+
+        taxData.value.deductions = parseFloat(summary.fullyDeductible || summary.fully_deductible || 0) +
+          parseFloat(summary.partiallyDeductible || summary.partially_deductible || 0);
+
+   
       }
       // If the API returns snake_case format
       else {
@@ -721,11 +718,13 @@ const fetchExpenseSummary = async () => {
           unassigned: 0,
           unassignedCount: 0
         };
-        
-        taxData.value.deductions = parseFloat(response.data.fully_deductible || 0) + 
-                                  parseFloat(response.data.partially_deductible || 0);
-      }
+
+        taxData.value.deductions = parseFloat(response.data.fully_deductible || 0) +
+          parseFloat(response.data.partially_deductible || 0);
+
       
+      }
+
       // Initialize or update the chart with the new data
       initExpensesChart();
     } else {
@@ -736,14 +735,29 @@ const fetchExpenseSummary = async () => {
     // Keep using the default values if API fails
   }
 };
+watch(() => [userDataLoaded.value, authStore.user?.data_filled], () => {
+  checkAndShowWizard();
+});
+
+const fetchIncomeSummary = async () => {
+  try {
+    const response = await api.get('/get-income-summary');
+    taxData.value.annualIncome = response.data.annualIncome;
+  } catch (error) {
+    console.error('Error fetching income summary:', error);
+  }
+};
+
 
 onMounted(async () => {
   try {
     await authStore.fetchUser();
-    checkWizardStatus();
+    checkAndShowWizard();
     await fetchDeductibilitySummary();
     await fetchTaxSuggestions();
     await fetchExpenseSummary();
+    fetchIncomeSummary();
+
   } catch (error) {
     console.error('Failed to fetch user data:', error);
   } finally {

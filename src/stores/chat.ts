@@ -16,7 +16,6 @@ export const useChatStore = defineStore('chat', () => {
       time: formatTime(new Date())
     }
   ]);
-
   function toggleChat() {
     isOpen.value = !isOpen.value;
   }
@@ -29,6 +28,14 @@ export const useChatStore = defineStore('chat', () => {
     messages.value.push(message);
   }
 
+  function removeLastMessage() {
+    messages.value.pop();
+  }
+
+  function clearMessages() {
+    messages.value = [];
+  }
+
   function formatTime(date: Date): string {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
@@ -39,6 +46,8 @@ export const useChatStore = defineStore('chat', () => {
     toggleChat,
     minimizeChat,
     addMessage,
+    removeLastMessage,
+    clearMessages,
     formatTime
   };
 });

@@ -336,6 +336,7 @@ import { ref, computed, onMounted, defineComponent, h } from 'vue';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import ReceiptForm from '@/components/receipt/ReceiptForm.vue';
 import api from '@/services/api';
+import router from '@/router';
 
 // Define icons
 const UploadIcon = defineComponent({
@@ -919,13 +920,15 @@ const saveAllReceipts = async (updatedReceipts = null) => {
     // Complete saving
     processingProgress.value = 100;
     processingMessage.value = 'All receipts saved successfully!';
-    
+        // Clear receipts and reset state
+    extractedReceipts.value = [];
+    selectedMethod.value = null;
+    selectedFiles.value = [];
+    router.push('/expenses');
     // Short delay before resetting
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Clear receipts and reset state
-    extractedReceipts.value = [];
-    selectedMethod.value = null;
+
     
   } catch (error) {
     console.error('Error saving receipts:', error);

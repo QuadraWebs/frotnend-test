@@ -122,7 +122,7 @@
         email: email.value,
         password: password.value
       });
-      router.push('/dashboard');
+      router.push('/');
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Login failed. Please check your credentials and try again.';
     } finally {

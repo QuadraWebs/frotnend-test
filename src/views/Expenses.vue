@@ -77,7 +77,9 @@
                         class="bg-gray-50 rounded-lg p-3">
                         <div class="flex items-center justify-between">
                           <div class="flex items-center">
+                 
                             <div class="h-8 w-8 rounded-full flex items-center justify-center"
+                            
                               :class="getCategoryColor(category.name)">
                               <component :is="getCategoryIcon(category.name)" class="h-4 w-4 text-white" />
                             </div>
@@ -93,6 +95,39 @@
                   </div>
                 </div>
               </div>
+
+              <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+              <div class="px-4 py-3 border-b border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-900">
+                  Tax Savings Suggestions
+                </h3>
+              </div>
+              <div class="px-4 py-3">
+                <div v-if="loadingSuggestions" class="flex justify-center py-4">
+                  <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                </div>
+                <div v-else-if="taxSuggestions.length === 0" class="text-center py-4">
+                  <p class="text-sm text-gray-500">No tax savings suggestions available at this time.</p>
+                </div>
+                <div v-else class="space-y-3">
+                  <div v-for="(tip, index) in taxSuggestions" :key="index" class="flex p-2 rounded-lg bg-yellow-50">
+                    <div class="flex-shrink-0">
+                      <LightbulbIcon class="h-4 w-4 text-yellow-500" />
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="text-xs font-medium text-gray-900">{{ tip.title }}</h4>
+                      <p class="mt-0.5 text-xs text-gray-600">{{ tip.description }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
   
               <!-- Expense Filters - Stack on mobile -->
               <div class="bg-white overflow-hidden shadow-sm rounded-lg">
@@ -540,6 +575,20 @@ const fetchExpenseSummary = async () => {
     console.error('Error fetching expense summary:', error);
     // If API fails, calculate from local expenses data
     calculateExpenseSummary();
+  }
+};
+const taxSuggestions = ref([]);
+const loadingSuggestions = ref(true);
+const fetchTaxSuggestions = async () => {
+  try {
+    loadingSuggestions.value = true;
+    const response = await api.get('/dashboard/tax-suggestions');
+    taxSuggestions.value = response.data.suggestions || [];
+  } catch (error) {
+    console.error('Failed to fetch tax suggestions:', error);
+    taxSuggestions.value = [];
+  } finally {
+    loadingSuggestions.value = false;
   }
 };
 
@@ -1122,11 +1171,10 @@ const HomeIcon = defineComponent({
 
 // Methods
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-MY', {
     style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
+    currency: 'MYR',
+    minimumFractionDigits: 0
   }).format(amount);
 };
 
@@ -1161,19 +1209,50 @@ const getCategoryIcon = (categoryName: string) => {
 };
 
 const getCategoryColor = (categoryName: string): string => {
-  const name = categoryName.toLowerCase();
-  if (name.includes('office')) return 'bg-blue-500';
-  if (name.includes('meal') || name.includes('food') || name.includes('entertainment')) return 'bg-yellow-500';
-  if (name.includes('software') || name.includes('computer')) return 'bg-purple-500';
-  if (name.includes('travel')) return 'bg-green-500';
-  if (name.includes('equipment')) return 'bg-red-500';
-  if (name.includes('utilities')) return 'bg-orange-500';
-  if (name.includes('development') || name.includes('education')) return 'bg-indigo-500';
-  if (name.includes('marketing')) return 'bg-pink-500';
-  if (name.includes('insurance')) return 'bg-teal-500';
-  if (name.includes('rent') || name.includes('space')) return 'bg-gray-500';
-  return 'bg-indigo-500';
+  // Convert input to lowercase for comparison
+  const name = categoryName?.toLowerCase() || '';
+  
+  const colorMap = {
+    'PARENTS MEDICAL CARER': 'bg-fuchsia-600',
+    'DISABLED EQUIPMENT': 'bg-fuchsia-600',
+    'BASIC EDUCATION FEES': 'bg-purple-500',
+    'HIGHER EDUCATION FEES': 'bg-violet-600',
+    'SELF ENHANCEMENT COURSES': 'bg-blue-500',
+    'SERIOUS MEDICAL EXPENSES': 'bg-cyan-500',
+    'FERTILITY TREATMENT': 'bg-teal-600',
+    'VACCINATION': 'bg-emerald-500',
+    'MEDICAL EXAMINATION': 'bg-green-600',
+    'COVID-19 DETECTION': 'bg-lime-500',
+    'MENTAL HEALTH CARE': 'bg-yellow-600',
+    'LEARNING DISABILITY ASSESSMENT': 'bg-amber-500',
+    'LEARNING DISABILITY TREATMENT': 'bg-orange-600',
+    'READING MATERIALS': 'bg-red-500',
+    'ELECTRONIC GADGET': 'bg-sky-600',
+    'GYM AND SPORTS EQUIPMENT': 'bg-pink-500',
+    'INTERNET SUBSCRIPTION': 'bg-slate-600',
+    'ADDITIONAL SPORTS EQUIPMENT': 'bg-stone-500',
+    'SPORTS RENTAL AND ENTRANCE FEES': 'bg-zinc-600',
+    'SPORTS COMPETITION FEES': 'bg-neutral-500',
+    'BREASTFEEDING EQUIPMENT': 'bg-rose-700',
+    'CHILDCARE FEES': 'bg-fuchsia-700',
+    'SSPN': 'bg-purple-700',
+    'LIFE INSURANCE': 'bg-violet-700',
+    'FOOD': 'bg-blue-700',
+    'PRS AND DEFERRED ANNUITY': 'bg-cyan-700',
+    'EDUCATION AND MEDICAL INSURANCE': 'bg-teal-700',
+    'SOCSO': 'bg-emerald-700',
+    'ELECTRIC VEHICLE FEE': 'bg-green-700'
+  };
+
+  // Find matching color regardless of case
+  const color = Object.entries(colorMap).find(([key]) => 
+    key.toLowerCase() === name
+  )?.[1];
+
+  return color || 'bg-rose-500';
 };
+
+
 
 const getDeductibilityLabel = (deductibilityId: number, percentage: number): string => {
   if (deductibilityId === 1) return 'Fully Deductible';
@@ -1394,45 +1473,69 @@ const confirmDelete = () => {
 // Initialize the expenses chart
 const initExpensesChart = () => {
   if (!expensesChart.value) return;
-
   const ctx = expensesChart.value.getContext('2d');
   if (!ctx) return;
 
-  // Destroy existing chart if it exists
   if (chart) {
     chart.destroy();
   }
 
-  // Prepare data for chart
+  // Convert Tailwind colors to RGBA
+  const tailwindToRGBA = (colorClass: string, opacity: number) => {
+    const colorMap = {
+      'bg-fuchsia-600': 'rgba(192, 38, 211, ',
+      'bg-purple-500': 'rgba(168, 85, 247, ',
+      'bg-violet-600': 'rgba(124, 58, 237, ',
+      'bg-blue-500': 'rgba(59, 130, 246, ',
+      'bg-cyan-500': 'rgba(6, 182, 212, ',
+      'bg-teal-600': 'rgba(13, 148, 136, ',
+      'bg-emerald-500': 'rgba(16, 185, 129, ',
+      'bg-green-600': 'rgba(22, 163, 74, ',
+      'bg-lime-500': 'rgba(132, 204, 22, ',
+      'bg-yellow-600': 'rgba(202, 138, 4, ',
+      'bg-amber-500': 'rgba(245, 158, 11, ',
+      'bg-orange-600': 'rgba(234, 88, 12, ',
+      'bg-red-500': 'rgba(239, 68, 68, ',
+      'bg-sky-600': 'rgba(2, 132, 199, ',
+      'bg-pink-500': 'rgba(236, 72, 153, ',
+      'bg-slate-600': 'rgba(71, 85, 105, ',
+      'bg-stone-500': 'rgba(120, 113, 108, ',
+      'bg-zinc-600': 'rgba(82, 82, 91, ',
+      'bg-neutral-500': 'rgba(115, 115, 115, ',
+      'bg-rose-700': 'rgba(190, 18, 60, ',
+      'bg-fuchsia-700': 'rgba(162, 28, 175, ',
+      'bg-purple-700': 'rgba(126, 34, 206, ',
+      'bg-violet-700': 'rgba(109, 40, 217, ',
+      'bg-blue-700': 'rgba(29, 78, 216, ',
+      'bg-cyan-700': 'rgba(14, 116, 144, ',
+      'bg-teal-700': 'rgba(15, 118, 110, ',
+      'bg-emerald-700': 'rgba(4, 120, 87, ',
+      'bg-green-700': 'rgba(21, 128, 61, ',
+      'bg-rose-500': 'rgba(244, 63, 94, '
+    };
+    return (colorMap[colorClass] || 'rgba(99, 102, 241, ') + opacity + ')';
+  };
+
   const categoryTotals = new Map();
-  
   expenses.value.forEach(expense => {
     const categoryName = getCategoryName(expense.category_id);
     const currentTotal = categoryTotals.get(categoryName) || 0;
     categoryTotals.set(categoryName, currentTotal + parseFloat(expense.total_price));
   });
-  
-  // Sort categories by total amount (descending)
+
   const sortedCategories = Array.from(categoryTotals.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6); // Show top 6 categories
-  
+    .slice(0, 6);
+
   const labels = sortedCategories.map(([name]) => name);
   const data = sortedCategories.map(([, total]) => total);
   const backgroundColors = labels.map(name => {
-    const colorClass = getCategoryColor(name);
-    // Extract color from Tailwind class
-    if (colorClass.includes('blue')) return 'rgba(59, 130, 246, 0.7)';
-    if (colorClass.includes('yellow')) return 'rgba(245, 158, 11, 0.7)';
-    if (colorClass.includes('purple')) return 'rgba(139, 92, 246, 0.7)';
-    if (colorClass.includes('green')) return 'rgba(16, 185, 129, 0.7)';
-    if (colorClass.includes('red')) return 'rgba(239, 68, 68, 0.7)';
-    if (colorClass.includes('orange')) return 'rgba(249, 115, 22, 0.7)';
-    if (colorClass.includes('indigo')) return 'rgba(99, 102, 241, 0.7)';
-    if (colorClass.includes('pink')) return 'rgba(236, 72, 153, 0.7)';
-    if (colorClass.includes('teal')) return 'rgba(20, 184, 166, 0.7)';
-    if (colorClass.includes('gray')) return 'rgba(107, 114, 128, 0.7)';
-    return 'rgba(99, 102, 241, 0.7)'; // Default indigo
+    const tailwindColor = getCategoryColor(name);
+    return tailwindToRGBA(tailwindColor, 0.7);
+  });
+  const borderColors = labels.map(name => {
+    const tailwindColor = getCategoryColor(name);
+    return tailwindToRGBA(tailwindColor, 1);
   });
 
   chart = new Chart(ctx, {
@@ -1442,7 +1545,7 @@ const initExpensesChart = () => {
       datasets: [{
         data: data,
         backgroundColor: backgroundColors,
-        borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+        borderColor: borderColors,
         borderWidth: 1
       }]
     },
@@ -1453,9 +1556,7 @@ const initExpensesChart = () => {
         legend: {
           position: 'bottom',
           labels: {
-            font: {
-              size: 11
-            },
+            font: { size: 11 },
             padding: 10,
             usePointStyle: true,
             pointStyle: 'circle'
@@ -1463,10 +1564,11 @@ const initExpensesChart = () => {
         },
         tooltip: {
           callbacks: {
-            label: function (context) {
+            label: function(context) {
               const label = context.label || '';
               const value = context.raw as number;
-              const percentage = ((value / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+              const total = data.reduce((a, b) => a + b, 0);
+              const percentage = ((value / total) * 100).toFixed(1);
               return `${label}: ${formatCurrency(value)} (${percentage}%)`;
             }
           }
@@ -1476,6 +1578,8 @@ const initExpensesChart = () => {
     }
   });
 };
+
+
 
 onMounted(async () => {
   await authStore.fetchUser();
@@ -1488,6 +1592,8 @@ onMounted(async () => {
       initExpensesChart();
     }, 100);
   }, 1000);
+  fetchTaxSuggestions();
+
 });
 
 watch([() => filters.value.category, () => filters.value.deductibility], () => {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import api from '@/services/api';
+import directApi, { getDirectCsrfCookie } from '@/services/api-direct';
 import axios from 'axios';
 interface User {
   id: number;
@@ -45,11 +45,10 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       
       try {
-        // Get CSRF cookie first
-        await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
-          withCredentials: true,
-        });
+        // Get CSRF cookie using direct function
+        await getDirectCsrfCookie();
 
+        // Use direct axios call with hardcoded URL
         const response = await axios.post('http://47.250.14.113/api/register', data, {
           headers: {
             'Accept': 'application/json',
@@ -72,17 +71,11 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       
       try {
-        const csrfUrl = 'http://47.250.14.113/sanctum/csrf-cookie';
-        console.log('Fetching CSRF from hardcoded URL:', csrfUrl);
+        // Get CSRF cookie using direct function
+        await getDirectCsrfCookie();
         
-        await axios.get(csrfUrl, {
-          withCredentials: true,
-        });
-        
-        const loginUrl = 'http://47.250.14.113/api/login';
-        console.log('Posting login to hardcoded URL:', loginUrl);
-        
-        const response = await axios.post(loginUrl, credentials, {
+        // Use direct axios call with hardcoded URL
+        const response = await axios.post('http://47.250.14.113/api/login', credentials, {
           headers: {
             'Accept': 'application/json',
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),

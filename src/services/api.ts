@@ -23,9 +23,7 @@ export const getCsrfCookie = async (): Promise<void> => {
     const csrfUrl = 'http://47.250.14.113/sanctum/csrf-cookie';
     console.log('Fetching CSRF cookie from (forced):', csrfUrl);
     
-    await axios.get(csrfUrl, {
-      withCredentials: false
-    });
+    await axios.get(csrfUrl);
   } catch (error) {
     console.error('Failed to fetch CSRF cookie:', error);
   }
@@ -36,8 +34,7 @@ const axiosInstance = axios.create({
   baseURL: apiUrl,
   headers: {
     'Accept': 'application/json'
-  },
-  withCredentials: false
+  }
 });
 
 // Add request interceptor

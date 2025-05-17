@@ -118,7 +118,6 @@
       loading.value = true;
       error.value = null;
       
-      console.log('Attempting login with credentials:', credentials);
       
       // Use the specialized CSRF-aware login function
       const response = await csrfLogin(credentials.email, credentials.password);

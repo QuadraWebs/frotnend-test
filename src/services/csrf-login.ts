@@ -19,9 +19,7 @@ export async function csrfLogin(email: string, password: string) {
   try {
     // Step 1: Get CSRF cookie
     console.log('Fetching CSRF cookie...');
-    await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
-      withCredentials: false
-    });
+    await axios.get('http://47.250.14.113/sanctum/csrf-cookie');
     
     // Step 2: Get the CSRF token from cookies
     const csrfToken = getCookie('XSRF-TOKEN');
@@ -40,8 +38,7 @@ export async function csrfLogin(email: string, password: string) {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'X-XSRF-TOKEN': csrfToken
-        },
-        withCredentials: false
+        }
       }
     );
     

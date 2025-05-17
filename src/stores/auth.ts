@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import directApi, { getDirectCsrfCookie } from '@/services/api-direct';
+import simpleApi from '@/services/simple-api';
 import axios from 'axios';
 interface User {
   id: number;
@@ -53,8 +53,7 @@ export const useAuthStore = defineStore('auth', {
           headers: {
             'Accept': 'application/json',
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
-          },
-          withCredentials: false,
+          }
         });
         
         return response.data;
@@ -85,12 +84,11 @@ export const useAuthStore = defineStore('auth', {
         }
         
         // Make the login request with the CSRF token
-        const response = await axios.post('http://47.250.14.113/api/login', credentials, {
+        const response = await axios.post('http://47.250.14.113/api/login', {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-          },
-          withCredentials: false
+          }
         });
         
         console.log('Login response:', response.data);
@@ -114,12 +112,19 @@ export const useAuthStore = defineStore('auth', {
     
     
     
+    
     async logout() {
       this.loading = true;
       
       try {
-        await api.post('/logout');
-        // No need to add headers here as the API service already adds them
+        if (this.token) {
+          // Use Authorization header instead of cookies
+          await simpleApi.post('/logout', {}, {
+            headers: {
+              'Authorization': `Bearer ${this.token}`
+            }
+          });
+        }
       } catch (error) {
         console.error('Logout error:', error);
       } finally {
@@ -137,7 +142,7 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       
       try {
-        const response = await api.get('/user');
+        const response = await simpleApi.get('/user');
         this.user = response.data;
         this.isAuthenticated = true;
       } catch (error) {

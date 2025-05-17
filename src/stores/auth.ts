@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
             'Accept': 'application/json',
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
           },
-          withCredentials: true,
+          withCredentials: false,
         });
         
         return response.data;
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore('auth', {
             'Content-Type': 'application/json',
             'X-XSRF-TOKEN': csrfToken
           },
-          withCredentials: true
+          withCredentials: false
         });
         
         console.log('Login response:', response.data);

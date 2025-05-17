@@ -7,7 +7,7 @@ const directApi = axios.create({
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  withCredentials: true // Important for cookies
+  withCredentials: false
 });
 
 // Direct CSRF cookie function with error handling
@@ -17,7 +17,7 @@ export const getDirectCsrfCookie = async (): Promise<void> => {
       
       // Make a request to the CSRF endpoint
       const response = await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
-        withCredentials: true
+        withCredentials: false
       });
       
       console.log('CSRF cookie response:', response);

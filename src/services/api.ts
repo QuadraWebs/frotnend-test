@@ -24,7 +24,7 @@ export const getCsrfCookie = async (): Promise<void> => {
     console.log('Fetching CSRF cookie from (forced):', csrfUrl);
     
     await axios.get(csrfUrl, {
-      withCredentials: true
+      withCredentials: false
     });
   } catch (error) {
     console.error('Failed to fetch CSRF cookie:', error);
@@ -37,7 +37,7 @@ const axiosInstance = axios.create({
   headers: {
     'Accept': 'application/json'
   },
-  withCredentials: true // This ensures cookies are sent with cross-origin requests
+  withCredentials: false
 });
 
 // Add request interceptor

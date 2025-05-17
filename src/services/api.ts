@@ -21,7 +21,7 @@ const getCookie = (name: string): string => {
 // Function to get CSRF token
 export const getCsrfCookie = async (): Promise<void> => {
   try {
-    await axios.get(`${baseUrl}/sanctum/csrf-cookie`, {
+    await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
       withCredentials: true
     });
   } catch (error) {

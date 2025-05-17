@@ -97,6 +97,18 @@
                                     placeholder="e.g. +65 9123 4567" />
                             </div>
                         </div>
+                        
+                        <div class="relative">
+                            <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <UserIcon class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <input type="number" id="age" v-model="formData.age"
+                                    class="pl-10 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-lg"
+                                    placeholder="Your age" min="18" max="120" />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -546,6 +558,7 @@ const formData = ref({
     nricName: '',
     nric: '',
     tin: '',           // TIN field
+    age: '',    
     phoneNumber: '',
     statementMethod: 'connect'
 });

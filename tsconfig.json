@@ -4,8 +4,8 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "module": "ESNext",  // Add this line
-    "moduleResolution": "node",  // Add this line
+    "module": "node16",  // Add this line
+    "moduleResolution": "node16",  // Add this line
     "esModuleInterop": true,  // Recommended
     "allowSyntheticDefaultImports": true,  // Recommended
     "target": "ESNext"  // Add this line

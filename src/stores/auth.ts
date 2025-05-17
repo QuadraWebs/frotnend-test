@@ -46,11 +46,11 @@ export const useAuthStore = defineStore('auth', {
       
       try {
         // Get CSRF cookie first
-        await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+        await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
           withCredentials: true,
         });
 
-        const response = await axios.post('http://localhost:8000/api/register', data, {
+        const response = await axios.post('http://47.250.14.113/api/register', data, {
           headers: {
             'Accept': 'application/json',
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
@@ -73,11 +73,11 @@ export const useAuthStore = defineStore('auth', {
       
       try {
         // Get CSRF cookie first
-        await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+        await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
           withCredentials: true,
         });
         
-        const response = await axios.post('http://localhost:8000/api/login', credentials, {
+        const response = await axios.post('http://47.250.14.113/api/login', credentials, {
           headers: {
             'Accept': 'application/json',
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),

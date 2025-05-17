@@ -1,8 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // Get base URL from environment variables
-const baseUrl = import.meta.env.VITE_API_URL || 'http://47.250.14.113';
-// Ensure we have a clean path join
+const baseUrl = 'http://47.250.14.113';
 const apiUrl = baseUrl.endsWith('/') ? `${baseUrl}api` : `${baseUrl}/api`;
 
 // Helper function to get cookies
@@ -18,10 +17,13 @@ const getCookie = (name: string): string => {
   return '';
 };
 
-// Function to get CSRF token
 export const getCsrfCookie = async (): Promise<void> => {
   try {
-    await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
+    // Force the CSRF URL to be the production URL
+    const csrfUrl = 'http://47.250.14.113/sanctum/csrf-cookie';
+    console.log('Fetching CSRF cookie from (forced):', csrfUrl);
+    
+    await axios.get(csrfUrl, {
       withCredentials: true
     });
   } catch (error) {

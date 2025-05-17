@@ -72,12 +72,17 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       
       try {
-        // Get CSRF cookie first
-        await axios.get('http://47.250.14.113/sanctum/csrf-cookie', {
+        const csrfUrl = 'http://47.250.14.113/sanctum/csrf-cookie';
+        console.log('Fetching CSRF from hardcoded URL:', csrfUrl);
+        
+        await axios.get(csrfUrl, {
           withCredentials: true,
         });
         
-        const response = await axios.post('http://47.250.14.113/api/login', credentials, {
+        const loginUrl = 'http://47.250.14.113/api/login';
+        console.log('Posting login to hardcoded URL:', loginUrl);
+        
+        const response = await axios.post(loginUrl, credentials, {
           headers: {
             'Accept': 'application/json',
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),

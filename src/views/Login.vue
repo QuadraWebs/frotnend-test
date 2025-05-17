@@ -80,6 +80,7 @@
   import AppInput from '@/components/common/AppInput.vue';
   import AppButton from '@/components/common/AppButton.vue';
   import AppAlert from '@/components/common/AppAlert.vue';
+  import { csrfLogin } from '@/services/csrf-login';
   
   const router = useRouter();
   const authStore = useAuthStore();
@@ -117,26 +118,20 @@
       loading.value = true;
       error.value = null;
       
-      // Try the store method first
-      try {
-        await authStore.login(credentials);
-        router.push('/dashboard');
-      } catch (storeError) {
-        console.error('Store login failed, trying direct login:', storeError);
-        
-        // Fall back to direct login
-        const response = await directLogin(credentials.email, credentials.password);
-        
-        // Manually update the store
-        authStore.user = response.user;
-        authStore.token = response.token;
-        authStore.isAuthenticated = true;
-        localStorage.setItem('token', response.token);
-        
-        router.push('/dashboard');
-      }
+      console.log('Attempting login with credentials:', credentials);
+      
+      // Use the specialized CSRF-aware login function
+      const response = await csrfLogin(credentials.email, credentials.password);
+      
+      // Manually update the store
+      authStore.user = response.user;
+      authStore.token = response.token;
+      authStore.isAuthenticated = true;
+      localStorage.setItem('token', response.token);
+      
+      router.push('/dashboard');
     } catch (error: any) {
-      console.error('Login failed completely:', error);
+      console.error('Login failed:', error);
       error.value = error.response?.data?.message || 'Login failed. Please check your credentials.';
     } finally {
       loading.value = false;

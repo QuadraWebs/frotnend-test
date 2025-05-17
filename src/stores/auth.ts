@@ -73,61 +73,45 @@ export const useAuthStore = defineStore('auth', {
       try {
         console.log('Starting login process...');
         
-        // Skip CSRF for now since we're having CORS issues
-        // await getDirectCsrfCookie();
+        // First, get the CSRF cookie
+        await getDirectCsrfCookie();
         
-        console.log('Attempting login...');
+        // Get the CSRF token from cookies
+        const csrfToken = getCookie('XSRF-TOKEN');
+        console.log('CSRF Token for login:', csrfToken);
         
-        // Try using the proxy first
-        try {
-          const response = await axios.post('/api/login', credentials, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            withCredentials: true,
-          });
-          
-          console.log('Login successful via proxy');
-          
-          this.user = response.data.user;
-          this.token = response.data.token;
-          this.isAuthenticated = true;
-          
-          localStorage.setItem('token', response.data.token);
-          
-          return response.data;
-        } catch (proxyError) {
-          console.error('Login via proxy failed:', proxyError);
-          
-          // Fall back to direct URL
-          console.log('Trying direct URL for login...');
-          const response = await axios.post('http://47.250.14.113/api/login', credentials, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            withCredentials: true,
-          });
-          
-          console.log('Login successful via direct URL');
-          
-          this.user = response.data.user;
-          this.token = response.data.token;
-          this.isAuthenticated = true;
-          
-          localStorage.setItem('token', response.data.token);
-          
-          return response.data;
+        if (!csrfToken) {
+          console.warn('No CSRF token available for login request');
         }
+        
+        // Make the login request with the CSRF token
+        const response = await axios.post('http://47.250.14.113/api/login', credentials, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': csrfToken
+          },
+          withCredentials: true
+        });
+        
+        console.log('Login response:', response.data);
+        
+        this.user = response.data.user;
+        this.token = response.data.token;
+        this.isAuthenticated = true;
+        
+        localStorage.setItem('token', response.data.token);
+        
+        return response.data;
       } catch (error: any) {
-        console.error('Login failed completely:', error);
+        console.error('Login failed:', error);
         this.error = error.response?.data?.message || 'Login failed';
         throw error;
       } finally {
         this.loading = false;
       }
-    },
+    }
+    ,
     
     
     

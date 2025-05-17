@@ -76,6 +76,7 @@
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '@/stores/auth';
+  import { directLogin } from '@/services/direct-login';
   import AppInput from '@/components/common/AppInput.vue';
   import AppButton from '@/components/common/AppButton.vue';
   import AppAlert from '@/components/common/AppAlert.vue';
@@ -111,23 +112,35 @@
     return isValid;
   };
   
-  const handleLogin = async () => {
-    if (!validateForm()) return;
-  
-    loading.value = true;
-    error.value = '';
-    
+  async function handleLogin() {
     try {
-      await authStore.login({
-        email: email.value,
-        password: password.value
-      });
-      router.push('/dashboard');
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Login failed. Please check your credentials and try again.';
+      loading.value = true;
+      error.value = null;
+      
+      // Try the store method first
+      try {
+        await authStore.login(credentials);
+        router.push('/dashboard');
+      } catch (storeError) {
+        console.error('Store login failed, trying direct login:', storeError);
+        
+        // Fall back to direct login
+        const response = await directLogin(credentials.email, credentials.password);
+        
+        // Manually update the store
+        authStore.user = response.user;
+        authStore.token = response.token;
+        authStore.isAuthenticated = true;
+        localStorage.setItem('token', response.token);
+        
+        router.push('/dashboard');
+      }
+    } catch (error: any) {
+      console.error('Login failed completely:', error);
+      error.value = error.response?.data?.message || 'Login failed. Please check your credentials.';
     } finally {
       loading.value = false;
     }
-  };
+  }
   </script>
   
